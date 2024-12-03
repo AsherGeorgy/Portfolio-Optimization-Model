@@ -1,97 +1,79 @@
 import streamlit as st
+import yfinance as yf
 import numpy as np
+from fredapi import Fred
 
 # Function to generate random inputs
 def generate_random_inputs():
     # Generate random stock tickers
     sample_assets = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'TSLA']
     assets_list = np.random.choice(sample_assets, size=3, replace=False)  # Select 3 random tickers
-    st.write("Running the model with random inputs:")
-    st.write(f"Selected Tickers: {', '.join(assets_list)}")
+    # Get names
+    asset_names = {'AAPL':'Apple Inc.', 'GOOG':'Alphabet Inc.', 'AMZN':'Amazon.com, Inc.', 'MSFT':'Microsoft Corporation', 'TSLA':'Tesla Inc.'}
+    names = [asset_names[asset] for asset in assets_list]
 
-    benchmark_index = '^GSPC'   # Default benchmark: S&P 500
-    risk_free_rate = 0.041      # Default risk-free rate
-    min_return = 0.08           # Default target return
+    return assets_list, names
 
-    return assets_list, benchmark_index, risk_free_rate, min_return
+def assets(user_input):
+    st.markdown("##### Processing input tickers...")
+    if not user_input:
+        st.error("Input cannot be empty.")
+        return None
 
-# Function for custom inputs
-def custom_inputs():
-    # Proceed with custom settings
-    default = 1
-    user_input = st.("Enter stock tickers separate by commas (skip to abort): ").strip()
-    input_split = user_input.split(',')
-    assets_list = [ticker.upper() for ticker in input_split]
-    
-    # Handle if empty or has invalid characters
-    try:
-        if not user_input.strip():
-            raise ValueError("No tickers were entered. Process aborted.")
-    except ValueError as e:
-        print(f"Critical Error:\n---------------\n{e}")
-        return [], default  
+    # Split and strip tickers, removing empty or whitespace-only entries
+    input_split = [ticker.strip().replace("'","").upper() for ticker in user_input.split(',') if ticker.strip()]
+    if not input_split:
+        st.error("No valid tickers found in input.")
+        return None
 
-    # Validate the tickers
-    print(f"Tickers entered: {', '.join(assets_list)}\n\nProcessing tickers......", end="")
-
-    assets = []
     invalid_tickers = []
+    valid_assets = []
+    stock_names = []
 
-    for ticker in assets_list:
+    for ticker in input_split:
         try:
             stock = yf.Ticker(ticker)
             stock_data = stock.history(period="1mo")
-            if stock_data.empty:
+            stock_name = stock.info.get("longName")
+            if stock_data.empty:  # Check if data exists for the ticker
                 invalid_tickers.append(ticker)
             else:
-                assets.append(ticker)
+                valid_assets.append(ticker)
+                stock_names.append(stock_name)
         except Exception:
             invalid_tickers.append(ticker)
 
-    # If there are invalid tickers
     if invalid_tickers:
-        print(f"\nCritical Error:\n---------------\nyfinance could not retrieve data for the following tickers: {', '.join(invalid_tickers)}.\n\nPlease check the tickers and try again.\ne.g., AAPL, WMT, GOOG")
-        return [], default  
+        st.error(f"Invalid ticker found: {', '.join(invalid_tickers)}")
+        st.error("Try again with valid tickers!")
+        return None
+    elif valid_assets:
+        st.success(f"Assets validated: {', '.join(stock_names)}")
+        return valid_assets
 
-    print("100%")
-    return assets, default
 
-
-
-
-    user_input = st.text_input("Enter stock tickers (separate by commas): ", placeholder="AAPL, MSFT, GOOG")
-    input_split = user_input.split(',')
-    assets_list = [ticker.strip().upper() for ticker in input_split]
+def risk_free_rate(api_key):
+    if api_key == 'No':
+        st.write("Default risk-free rate of 4.1% applied.")
+        return 0.041
     
-    # Handle if empty or has invalid characters
+    # Handle non-empty input
     try:
-        if not user_input.strip():
-            raise ValueError("No tickers were entered.")
-    except ValueError as e:
-        st.write(f"Critical Error:\n---------------\n{e}")
-        return [] 
+        # Initialize the FRED API with the provided API key
+        fred = Fred(api_key=api_key)
+        ten_year_treasury_rate = fred.get_series_latest_release('GS10') / 100
 
-    # Validate the tickers
-    st.write(f"Tickers entered: {', '.join(assets_list)}\n\nProcessing tickers......", end="")
+        # Handle error
+        if ten_year_treasury_rate is None or ten_year_treasury_rate.empty:
+            st.write("\nWarning:\n--------\nCould not retrieve valid data from FRED. Default risk-free rate of 4.1% applied.")
+            return 0.041
+        
+        return ten_year_treasury_rate.iloc[-1]
+    
+    except Exception as e:
+        st.write(f"\nError:\n------\nAn error occurred while retrieving the risk-free rate.\nDetails: {e}")
+        st.write("\nDefault rate of 4.1% applied.")
+        return 0.041
 
-    assets = []
-    invalid_tickers = []
 
-    for ticker in assets_list:
-        try:
-            stock = yf.Ticker(ticker)
-            stock_data = stock.history(period="1mo")
-            if stock_data.empty:
-                invalid_tickers.append(ticker)
-            else:
-                assets.append(ticker)
-        except Exception:
-            invalid_tickers.append(ticker)
 
-    # If there are invalid tickers
-    if invalid_tickers:
-        st.write(f"\nCritical Error:\n---------------\nyfinance could not retrieve data for the following tickers: {', '.join(invalid_tickers)}.\n\nPlease check the tickers and try again.\ne.g., AAPL, WMT, GOOG")
-        return [], default  # Return empty list instead of None
-
-    st.write("100%")
-    return assets, default
