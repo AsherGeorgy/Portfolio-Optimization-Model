@@ -17,7 +17,10 @@ def input_assets():
     """
 
     # Option to test the model with default values
-    user_input = input("Press 'Enter' or 'Esc' to run the model with default inputs, or any other key to proceed with custom settings: ")
+    while True:
+        user_input = input("Enter 'y' to customize the settings (skip to use default settings): ").lower().strip()
+        if user_input in ['y','n','','esc']:
+            break
 
     # test assets list to use if user chooses to use default inputs
     test_assets = [
@@ -30,7 +33,7 @@ def input_assets():
         'VNQ'    # Vanguard Real Estate ETF (Real Estate sector)
     ]
 
-    if user_input == "" or user_input.lower() == "esc":
+    if user_input == "" or user_input in ['n', "esc"]:
         # Run model with default inputs
         print("Running the model with default inputs:\n________________________________________________________________________\n")
         assets = test_assets
@@ -39,21 +42,21 @@ def input_assets():
         print("100%")
         default = 0
         return assets, default
-    else:
+    elif user_input == 'y':
         # Proceed with custom settings
         default = 1
         # Prompt user input
-        user_input = input("Enter stock tickers (separate by commas): ")
+        user_input = input("Enter stock tickers separate by commas (skip to abort): ").strip()
         input_split = user_input.split(',')
-        assets_list = [ticker.strip().upper() for ticker in input_split]
+        assets_list = [ticker.upper() for ticker in input_split]
     
     # Handle if empty or has invalid characters
     try:
         if not user_input.strip():
-            raise ValueError("No tickers were entered.")
+            raise ValueError("No tickers were entered. Process aborted.")
     except ValueError as e:
         print(f"Critical Error:\n---------------\n{e}")
-        return [], default  # Return empty list instead of None
+        return [], default  
 
     # Validate the tickers
     print(f"Tickers entered: {', '.join(assets_list)}\n\nProcessing tickers......", end="")
@@ -75,7 +78,7 @@ def input_assets():
     # If there are invalid tickers
     if invalid_tickers:
         print(f"\nCritical Error:\n---------------\nyfinance could not retrieve data for the following tickers: {', '.join(invalid_tickers)}.\n\nPlease check the tickers and try again.\ne.g., AAPL, WMT, GOOG")
-        return [], default  # Return empty list instead of None
+        return [], default  
 
     print("100%")
     return assets, default
@@ -619,6 +622,8 @@ def save_results(assets, optimal_weights, pfolio_volatility, pfolio_return, shar
             save_folder, assets, optimal_weights, pfolio_volatility,
             pfolio_return, sharpe_ratios
         )
+    else:
+        print("Results not saved.")
 
 def main():
     """
@@ -630,7 +635,6 @@ def main():
 
     # Step 2: Validate Assets
     if not assets:
-        print("No assets entered. Exiting.")
         return  # Exit if no assets are provided
 
     # Step 3: Set Parameters based on Default or User Input
