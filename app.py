@@ -64,30 +64,16 @@ with col1:
     # Run button for custom inputs
     run_button = st.button("Run")
 with col2:
-    # Button for testing with random inputs
+    # Random Button for testing with random tickers
     random_button = st.button("Test with random tickers")
 
 # Logic for Custom Inputs after validation
 if run_button:
-    # Validate that there are at least two tickers
-    tickers = [ticker.strip() for ticker in user_input.split(',') if ticker.strip()]  
-    if len(tickers) < 2:
-        st.error("Please enter at least two stock tickers.")
-        process_inputs = False
-    else:
-        st.session_state.inputs_ready = True
-        st.session_state.mode = "custom"
-        assets_list = utils.assets(user_input)
+    utils.run_button(user_input)
 
 # Logic for random Inputs 
 if random_button:
-    st.session_state.mode = "random"
-    st.session_state.inputs_ready = True  # Skip Run button for default inputs
-    assets_list, names = utils.generate_random_inputs()
-    # Logic for Random Inputs
-    if st.session_state.inputs_ready:
-        st.markdown("##### Preparing random tickers...")
-        st.success(f"Assets selected: {', '.join(names)}")
+    utils.random_button()
 
 
 

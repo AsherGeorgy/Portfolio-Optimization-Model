@@ -9,7 +9,7 @@ def generate_random_inputs():
     sample_assets = ['AAPL', 'GOOG', 'AMZN', 'MSFT', 'TSLA']
     assets_list = np.random.choice(sample_assets, size=3, replace=False)  # Select 3 random tickers
     # Get names
-    asset_names = {'AAPL':'Apple Inc.', 'GOOG':'Alphabet Inc.', 'AMZN':'Amazon.com, Inc.', 'MSFT':'Microsoft Corporation', 'TSLA':'Tesla Inc.'}
+    asset_names = {'AAPL':'Apple Inc. (AAPL)', 'GOOG':'Alphabet Inc. (GOOG)', 'AMZN':'Amazon.com Inc. (AMZN)', 'MSFT':'Microsoft Corporation (MSFT)', 'TSLA':'Tesla Inc. (TSLA)'}
     names = [asset_names[asset] for asset in assets_list]
 
     return assets_list, names
@@ -74,6 +74,27 @@ def risk_free_rate(api_key):
         st.write(f"\nError:\n------\nAn error occurred while retrieving the risk-free rate.\nDetails: {e}")
         st.write("\nDefault rate of 4.1% applied.")
         return 0.041
+    
+
+def run_button(user_input):
+    # Validate that there are at least two tickers
+    tickers = [ticker.strip() for ticker in user_input.split(',') if ticker.strip()]  
+    if len(tickers) < 2:
+        st.error("Please enter at least two stock tickers.")
+        process_inputs = False
+    else:
+        st.session_state.inputs_ready = True
+        st.session_state.mode = "custom"
+        assets_list = assets(user_input)
+
+def random_button():
+    st.session_state.mode = "random"
+    st.session_state.inputs_ready = True  # Skip Run button for default inputs
+    assets_list, names = generate_random_inputs()
+    # Logic for Random Inputs
+    if st.session_state.inputs_ready:
+        st.markdown("##### Preparing random tickers...")
+        st.success(f"Assets selected: {', '.join(names)}")
 
 
 
