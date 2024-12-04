@@ -122,7 +122,7 @@ def retrieve_risk_free_rate():
     # Handle empty input
     if not api_key or api_key.lower() == "esc":
         print("\nWarning:\n--------\nNo API key provided. Default risk-free rate of 4.1% applied.")
-        return 0.041
+        return 4.1
     
     # Handle non-empty input
     try:
@@ -133,14 +133,14 @@ def retrieve_risk_free_rate():
         # Handle error
         if ten_year_treasury_rate is None or ten_year_treasury_rate.empty:
             print("\nWarning:\n--------\nCould not retrieve valid data. Default risk-free rate of 4.1% applied.")
-            return 0.041
+            return 4.1
         
         return ten_year_treasury_rate.iloc[-1]
     
     except Exception as e:
         print(f"\nError:\n------\nAn error occurred while retrieving the risk-free rate.\nDetails: {e}")
         print("\nDefault rate of 4.1% applied.")
-        return 0.041
+        return 4.1
 
 def target_return():
     """
@@ -223,7 +223,7 @@ def retrieve_data(assets, risk_free_rate, benchmark_index, no_of_years):
     print(f'\n\nThe following analysis is based on {no_of_years}Y daily adjusted closing price data from Yahoo Finance.')
     print(f'\nTime period of analysis:    {(start_date).strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}')
     print(f'Index used as benchmark:    {benchmark_name}')
-    print(f'Risk free rate used:        {risk_free_rate*100:.2f}%')
+    print(f'Risk free rate used:        {risk_free_rate:.2f}%')
     print(f'\nAssets analysed:            {"\n                            ".join(asset_names)}')
     print('________________________________________________________________________')
         
@@ -274,23 +274,6 @@ def return_stats(adj_close, benchmark_df, combined_df, assets, benchmark_index, 
     plt.show()
     
     return returns_assets, returns_assets_ann, returns_assets_cov, returns_benchmark
-
-def portfolio_stats(weights, returns_assets, cov_assets, risk_free_rate):
-    """
-    Calculates portfolio return, volatility, and Sharpe ratio based on asset weights, returns, covariance, and risk-free rate.
-    Returns floats.
-    """
-
-    # Portfolio Return
-    portfolio_return = np.dot(weights, returns_assets.mean())
-    
-    # Portfolio Volatility
-    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_assets, weights)))
-    
-    # Portfolio Sharpe Ratio
-    sharpe_ratio = (portfolio_return - risk_free_rate) / portfolio_volatility
-    
-    return portfolio_return, portfolio_volatility, sharpe_ratio
 
 def eff_frontier(assets, returns_assets_ann, returns_assets_cov, risk_free_rate, no_of_iterations=1000):
     """
@@ -378,12 +361,14 @@ def opt_portfolio_results(optimal_weights, returns_assets_ann, returns_assets_co
         return
 
     # Calculate stats of portfolio with optimal weights
-    optimal_portfolio_return, optimal_portfolio_volatility, optimal_sharpe_ratio = portfolio_stats(
-        optimal_weights, 
-        returns_assets_ann, 
-        returns_assets_cov, 
-        risk_free_rate
-    )
+    # Portfolio Return
+    optimal_portfolio_return = np.dot(optimal_weights, returns_assets_ann.mean())
+    
+    # Portfolio Volatility
+    optimal_portfolio_volatility = np.sqrt(np.dot(optimal_weights.T, np.dot(returns_assets_cov, optimal_weights)))
+    
+    # Portfolio Sharpe Ratio
+    optimal_sharpe_ratio = (optimal_portfolio_return - risk_free_rate/100) / optimal_portfolio_volatility
 
     # Output the results of the portfolio optimization
     print(f"   Portfolio optimized for minimum volatility with a target return of {min_return*100:.2f}%:")
@@ -640,7 +625,7 @@ def main():
     # Step 3: Set Parameters based on Default or User Input
     if default == 0:                # User opts to use default inputs
         benchmark_index = '^GSPC'   # Default benchmark: S&P 500
-        risk_free_rate = 0.041      # Default risk-free rate
+        risk_free_rate = 4.1        # Default risk-free rate
         min_return = 0.08           # Default target return
    
     else:                           # User-provided input, set up accordingly                
