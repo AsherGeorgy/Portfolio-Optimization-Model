@@ -7,47 +7,53 @@ import numpy as np
 # Function to generate random inputs
 def generate_random_inputs():
     # Generate random stock tickers
-    sample_assets = [
-    "AAPL",  # Apple Inc. (Tech stock)
-    "MSFT",  # Microsoft Corp. (Tech stock)
-    "GOOGL",  # Alphabet Inc. (Tech stock)
-    "AMZN",  # Amazon.com Inc. (Consumer Discretionary)
-    "TSLA",  # Tesla Inc. (Consumer Discretionary)
-    "NVDA",  # NVIDIA Corporation (Tech stock)
-    "META",  # Meta Platforms Inc. (Tech stock)
-    "NFLX",  # Netflix Inc. (Communication Services)
-    "V",  # Visa Inc. (Financials)
-    "JPM",  # JPMorgan Chase & Co. (Financials)
-    "DIS",  # The Walt Disney Company (Communication Services)
-    "KO",  # The Coca-Cola Company (Consumer Staples)
-    "PEP",  # PepsiCo, Inc. (Consumer Staples)
-    "PFE",  # Pfizer Inc. (Healthcare)
-    "JNJ",  # Johnson & Johnson (Healthcare)
-    "UNH",  # UnitedHealth Group (Healthcare)
-    "WMT",  # Walmart Inc. (Consumer Staples)
-    "XOM",  # Exxon Mobil Corporation (Energy)
-    "CVX",  # Chevron Corporation (Energy)
-    "BA",  # Boeing Company (Industrials)
-    "CAT",  # Caterpillar Inc. (Industrials)
-    "GM",  # General Motors Company (Consumer Discretionary)
-    "IBM",  # International Business Machines (Tech stock)
-    "CSCO",  # Cisco Systems, Inc. (Tech stock)
-    "SPG",  # Simon Property Group (Real Estate)
-    "SLB",  # Schlumberger Limited (Energy)
-    "LMT",  # Lockheed Martin Corporation (Aerospace & Defense)
-    "GS",  # Goldman Sachs Group, Inc. (Financials)
-    "MRK",  # Merck & Co., Inc. (Healthcare)
-    "BNS",  # Bank of Nova Scotia (Financials)
-    "T",  # AT&T Inc. (Communication Services)
-    "VZ",  # Verizon Communications Inc. (Communication Services)
-]
-    assets_list = np.random.choice(sample_assets, size=10, replace=False)  # Select 5 random tickers
-    # Get names
-    #asset_names = {'AAPL':'Apple Inc. (AAPL)', 'GOOG':'Alphabet Inc. (GOOG)', 'AMZN':'Amazon.com Inc. (AMZN)', 'MSFT':'Microsoft Corporation (MSFT)', 'TSLA':'Tesla Inc. (TSLA)'}
-    #names = [asset_names[asset] for asset in assets_list]
-    names = []
+    sample_assets = {
+    "AAPL": "Apple Inc.",  # Tech stock
+    "MSFT": "Microsoft Corp.",  # Tech stock
+    "GOOGL": "Alphabet Inc.",  # Tech stock
+    "AMZN": "Amazon.com Inc.",  # Consumer Discretionary
+    "TSLA": "Tesla Inc.",  # Consumer Discretionary
+    "NVDA": "NVIDIA Corporation",  # Tech stock
+    "META": "Meta Platforms Inc.",  # Tech stock
+    "NFLX": "Netflix Inc.",  # Communication Services
+    "V": "Visa Inc.",  # Financials
+    "JPM": "JPMorgan Chase & Co.",  # Financials
+    "DIS": "The Walt Disney Company",  # Communication Services
+    "KO": "The Coca-Cola Company",  # Consumer Staples
+    "PEP": "PepsiCo, Inc.",  # Consumer Staples
+    "PFE": "Pfizer Inc.",  # Healthcare
+    "JNJ": "Johnson & Johnson",  # Healthcare
+    "UNH": "UnitedHealth Group",  # Healthcare
+    "WMT": "Walmart Inc.",  # Consumer Staples
+    "XOM": "Exxon Mobil Corporation",  # Energy
+    "CVX": "Chevron Corporation",  # Energy
+    "BA": "Boeing Company",  # Industrials
+    "CAT": "Caterpillar Inc.",  # Industrials
+    "GM": "General Motors Company",  # Consumer Discretionary
+    "IBM": "International Business Machines",  # Tech stock
+    "CSCO": "Cisco Systems, Inc.",  # Tech stock
+    "SPG": "Simon Property Group",  # Real Estate
+    "SLB": "Schlumberger Limited",  # Energy
+    "LMT": "Lockheed Martin Corporation",  # Aerospace & Defense
+    "GS": "Goldman Sachs Group, Inc.",  # Financials
+    "MRK": "Merck & Co., Inc.",  # Healthcare
+    "BNS": "Bank of Nova Scotia",  # Financials
+    "T": "AT&T Inc.",  # Communication Services
+    "VZ": "Verizon Communications Inc.",  # Communication Services
+    }
 
-    return assets_list, names
+    size = np.random.randint(3,11)
+    assets_list = np.random.choice(list(sample_assets.keys()), size=size, replace=False)  # Select random tickers
+    
+    st.markdown("##### Preparing random tickers...")
+    st.markdown(f"**Tickers selected**: {(', ').join(assets_list)}")
+    for ticker in assets_list:
+        st.success(f"Ticker validated: {sample_assets[ticker]} ({ticker}) ")
+
+    st.markdown('________________________________________________________________________')
+    st.markdown("##### Running optimization...")
+
+    return assets_list
 
 def assets(user_input):
     st.markdown("##### Processing input tickers...")
@@ -56,14 +62,15 @@ def assets(user_input):
         return None
 
     # Split and strip tickers, removing empty or whitespace-only entries
-    input_split = [ticker.strip().replace("'","").upper() for ticker in user_input.split(',') if ticker.strip()]
+    input_split = [ticker.strip().replace("'", "").upper() for ticker in user_input.split(',') if ticker.strip()]
     if not input_split:
-        st.error("No valid tickers found in input.")
+        st.error("No valid tickers found in input. Try again.")
+
         return None
 
     invalid_tickers = []
     valid_assets = []
-    stock_names = []
+    stock_names = {}
 
     for ticker in input_split:
         try:
@@ -74,7 +81,7 @@ def assets(user_input):
                 invalid_tickers.append(ticker)
             else:
                 valid_assets.append(ticker)
-                stock_names.append(stock_name)
+                stock_names[ticker] = stock_name
         except Exception:
             invalid_tickers.append(ticker)
 
@@ -83,7 +90,10 @@ def assets(user_input):
         st.error("Try again with valid tickers!")
         return None
     elif valid_assets:
-        st.success(f"Tickers validated: {', '.join(stock_names)}")
+        for ticker, name in stock_names.items():
+            st.success(f"Ticker validated: {name} ({ticker})")
+        st.markdown('________________________________________________________________________')
+        st.markdown("##### Running optimization...")
         return valid_assets
 
 def run_button(user_input):
@@ -93,20 +103,12 @@ def run_button(user_input):
         st.error("Please enter at least two stock tickers.")
         return None
     else:
-        st.session_state.inputs_ready = True
-        st.session_state.mode = "custom"
         assets_list = assets(user_input)
         return assets_list
 
 def random_button():
-    st.session_state.mode = "random"
-    st.session_state.inputs_ready = True  # Skip Run button for default inputs
-    assets_list, names = generate_random_inputs()
-    # Logic for Random Inputs
-    if st.session_state.inputs_ready:
-        st.markdown("##### Preparing random tickers...")
-        st.success(f"Assets selected: {', '.join(assets_list)}")
-        return assets_list
+    assets_list = generate_random_inputs()
+    return assets_list
 
 
 # Processes
@@ -123,14 +125,14 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     for t in assets_list:
         adj_close[t] = yf.download(t, start=start_date, end=end_date)['Adj Close']
         if adj_close[t].empty:
-            st.error(f"No data available for asset: {t}")
+            st.error(f"No data available for asset: {t}. Try again.")
             return None, None, None, None
     
     # Benchmark index data
     benchmark_df = pd.DataFrame()
     benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date)['Adj Close']
     if benchmark_df.empty:
-        st.error(f"No data available for benchmark index: {benchmark_index}")
+        st.error(f"No data available for benchmark index: {benchmark_index}.  Try again.")
         return None, None, None, None
     
     # Retrieve long names of assets 
@@ -148,6 +150,8 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     combined_df = pd.merge(adj_close, benchmark_df, left_index=True, right_index=True)
 
     # Outputs
+    # Separator line
+    st.markdown('________________________________________________________________________')
     st.markdown("<h2 style='text-align:center;'><u>Analysis</u></h2>",
     unsafe_allow_html=True,)
     st.markdown(f'##### The following analysis was conducted on {no_of_years}Y daily adjusted closing price data from Yahoo Finance.')
@@ -155,11 +159,8 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     st.markdown(f'**Index used as benchmark:**    {benchmark_name}')
     st.markdown(f'**Risk free rate used:**        {risk_free_rate*100:.2f}%')
     st.markdown(f'**Assets analysed:**           {",  ".join(asset_names)}')
+    st.markdown(f'**Techniques used:**           Convex Optimization, Modern Portfolio Theory')
     st.markdown('________________________________________________________________________')
-        
-    # Display the dataframes using Streamlit
-    # st.subheader("Adjusted Close Data for Assets and Benchmark:")
-    # st.dataframe(combined_df)
         
     return adj_close, benchmark_df, combined_df, benchmark_name
 
@@ -262,26 +263,38 @@ def eff_frontier(assets, returns_assets_ann, returns_assets_cov, risk_free_rate,
 
 import cvxpy as cp
 
-def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, min_return):
+def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
     """
     Optimizes portfolio allocation using Mean-Variance Optimization with convex optimization (cvxpy).
     Returns floats (or None if the optimization fails).
     """
 
+     # Display the portfolio optimization results
+    st.markdown("<h2><u>Convex Optimization</u></h2>",
+    unsafe_allow_html=True,)
+    st.markdown(f"#####  **Results**:")
+
     # Initialize variables
     n = len(returns_assets_ann.columns)  # Number of assets (columns in the dataframe)
     w = cp.Variable(n)  # Portfolio weights as a cvxpy variable
 
-    #st.write(f"\nII. Portfolio Analysis: \n\nA. Mean-Variance Optimization (cvxpy):")
-
-    # Check if the input min_return is feasible (it needs to be equal to or lower than the max average return of individual assets)
+    # Check if the input target_cagr is feasible (it needs to be equal to or lower than the max average return of individual assets)
     max_expected_return = returns_assets_ann.mean().max()
-    if min_return > max_expected_return:
-        st.write(f"\nWarning: The specified minimum return of {min_return*100:.2f}% exceeds the maximum feasible return of {max_expected_return*100:.2f}%.")
-        st.write("Adjusting the target return to the maximum feasible value to proceed with the optimization.")
-        min_return_valid = max_expected_return  # Adjust min_return to the highest feasible value
+    min_expected_return = returns_assets_ann.mean().min()
+
+    if target_cagr > max_expected_return:
+        st.error(f"Warning: The target CAGR of {target_cagr*100:.2f}% exceeds the maximum feasible portfolio CAGR of {max_expected_return*100:.2f}%, which is based on the highest historical return of the portfolio's assets during this time period.")
+        st.success(f"CAGR has been adjusted to the maximum feasible return of {(max_expected_return - 0.0001)*100:.2f}%.")
+        target_cagr_valid = max_expected_return - 0.0001  # Adjust target_cagr to the highest feasible value
+    elif target_cagr < min_expected_return:
+        st.warning(f"Warning: The target CAGR of {target_cagr*100:.2f}% is below the minimum feasible return of {min_expected_return*100:.2f}%, which is based on the lowest historical return of the portfolio's assets during this time period.")
+        st.success(f"CAGR has been adjusted to the minimum feasible return of {(min_expected_return + 0.0001)*100:.2f}%.")
+
+        target_cagr_valid = min_expected_return + 0.0001  # Adjust target_cagr to the lowest feasible value
     else:
-        min_return_valid = min_return
+        target_cagr_valid = target_cagr
+
+
     
     # Calculate expected Return and Risk
     ret = returns_assets_ann.mean().values @ w  # Expected return: dot product of weights and asset returns ("@" is the matrix multiplication operator)
@@ -293,7 +306,7 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, min_return):
     # Define the constraints: 
     constraints = [
         cp.sum(w) == 1,  # Sum of weights equals 1 (fully invested)
-        ret >= min_return_valid,  # Target minimum return constraint
+        ret == target_cagr_valid,  # Target minimum return constraint
         w >= 0  # Non-negative weights (no short positions)
     ]
     
@@ -305,12 +318,12 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, min_return):
     # Check if the optimization was successful and the optimal weights are valid
     if prob.status != cp.OPTIMAL or optimal_weights is None or any(np.isnan(optimal_weights)):
         st.write(f"Optimization failed. Solver status: {prob.status} or Invalid portfolio weights.")
-        return None, min_return_valid  
+        return None, target_cagr_valid  
 
-    return optimal_weights, min_return_valid
+    return optimal_weights, target_cagr_valid
 
 
-def opt_portfolio_results(optimal_weights, returns_assets_ann, returns_assets_cov, risk_free_rate, assets, min_return):
+def opt_portfolio_results(optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_cagr_valid):
     """
     Displays the results of the portfolio optimization if the optimal weights are valid.
     """
@@ -320,37 +333,54 @@ def opt_portfolio_results(optimal_weights, returns_assets_ann, returns_assets_co
         return
 
     # Calculate stats of portfolio with optimal weights
-    # Portfolio Return
-    optimal_portfolio_return = np.dot(optimal_weights, returns_assets_ann.mean())
-    
-    # Portfolio Volatility
-    optimal_portfolio_volatility = np.sqrt(np.dot(optimal_weights.T, np.dot(returns_assets_cov, optimal_weights)))
-    
-    # Portfolio Sharpe Ratio
-    optimal_sharpe_ratio = (optimal_portfolio_return - risk_free_rate) / optimal_portfolio_volatility
+    optimal_portfolio_return, optimal_portfolio_volatility, optimal_sharpe_ratio = portfolio_stats(optimal_weights, returns_assets_ann, returns_assets_cov, risk_free_rate)
 
-    # Display the portfolio optimization results
-    # st.subheader(f"Portfolio optimized for minimum volatility with a target return of {min_return * 100:.2f}%:")
+    # Create a DataFrame for weights with better formatting
+    results_df = pd.DataFrame({
+        "Asset": assets_list,
+        "Weight": [f"{weight * 100:.2f}%" for weight in optimal_weights]  # Format weights as percentages
+    })
 
-    # # Create a DataFrame for weights
-    # results_df = pd.DataFrame({
-    #     "Asset": assets,
-    #     "Weight": [f"{weight:.3f}" for weight in optimal_weights]
-    # })
+    # Set 'Asset' column as the index
+    results_df.set_index('Asset', inplace=True)
 
-    # # Display the results table
-    # st.table(results_df)
+    st.markdown(f"The portfolio allocation, optimized to meet the **target CAGR of {target_cagr_valid * 100:.2f}% while minimizing volatility**, based on historical data, is as follows:")
+    # Display the weights table
+    st.write(results_df.T)
 
-    # Display portfolio statistics
-    # st.text(f"Expected Annual Return: {optimal_portfolio_return * 100:.2f}%")
-    # st.text(f"Expected Volatility: {optimal_portfolio_volatility * 100:.2f}%")
-    # st.text(f"Sharpe Ratio: {optimal_sharpe_ratio:.4f}")
+    # Prepare cumulative returns for plotting
+    cumprod_df = returns_benchmark.copy()
+    cumprod_df.rename(columns={benchmark_index: benchmark_name}, inplace=True)
+
+    if optimal_weights is not None and not np.any(np.isnan(optimal_weights)):
+        pfolio_returns_at_optimal_weights = returns_assets.values @ optimal_weights
+        cumprod_df['Optimized Portfolio'] = pfolio_returns_at_optimal_weights
+
+    # Calculate cumulative returns
+    cumprod_df = (1 + cumprod_df).cumprod()
+
+    st.markdown(f"Here’s how the optimized portfolio performed over the past 10 years:")
+    # Create two columns for side-by-side layout
+    col1, col2 = st.columns([2, 6])  # Adjust column width ratio if needed
+
+    with col1:
+        # Display portfolio statistics using st.metric() with delta or custom formatting
+        st.metric(label="CAGR", value=f"{optimal_portfolio_return * 100:.2f}%")
+        st.metric(label="Average Annual Volatility", value=f"{optimal_portfolio_volatility * 100:.2f}%")
+        st.metric(label="Sharpe Ratio", value=f"{optimal_sharpe_ratio:.4f}")
+
+    with col2:
+        # Display the cumulative returns chart
+        st.line_chart(cumprod_df, use_container_width=True, x_label=f"Optimized Portfolio compared to {benchmark_name} over the past 10 years.")
+
+    st.write('________________________________________________________________________')
 
 
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
+import plotly.express as px
 
-def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios, returns_assets, optimal_weights, returns_benchmark, benchmark_name, assets, benchmark_index, no_of_iterations):
+def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios, returns_assets, optimal_weights, returns_benchmark, benchmark_name, benchmark_index, no_of_iterations, assets_list, returns_assets_ann, returns_all_corr, returns_assets_cov, risk_free_rate):
     """
     Visualizes portfolio analysis results in a Streamlit app, including the efficient frontier, identified portfolios, and their relative daily return movements.
     """
@@ -363,94 +393,256 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
     pfolio_returns_at_max_sharpe_weights = returns_assets.values @ weights[max_sharpe_idx]
     pfolio_returns_at_min_vol_weights = returns_assets.values @ weights[min_volatility_idx]
     pfolio_returns_at_max_ret_weights = returns_assets.values @ weights[max_return_idx]
-    
-    if optimal_weights is not None and not np.any(np.isnan(optimal_weights)):
-        pfolio_returns_at_optimal_weights = returns_assets.values @ optimal_weights
 
-    # Compare cumulative product of assets and benchmark
-    cumprod_df = returns_benchmark.copy()
-    cumprod_df.rename(columns={benchmark_index: benchmark_name}, inplace=True)
-    cumprod_df['Maximum Sharpe Ratio Portfolio'] = pfolio_returns_at_max_sharpe_weights
-    cumprod_df['Minimum Volatility Portfolio'] = pfolio_returns_at_min_vol_weights
-    cumprod_df['Maximum Return Portfolio'] = pfolio_returns_at_max_ret_weights
-    
-    if optimal_weights is not None and not np.any(np.isnan(optimal_weights)):
-        cumprod_df['Optimized Portfolio'] = pfolio_returns_at_optimal_weights
-
-    cumprod_df = (1 + cumprod_df).cumprod() - 1
 
     # Outputs
-    st.subheader("B. Markowitz Portfolio Analysis")
-    st.write(f"Number of iterations: {no_of_iterations}")
+    # Section Title
+    st.markdown("<h2><u>Modern Portfolio Theory</u></h2>", unsafe_allow_html=True)
 
-    # Plot the efficient frontier
-    st.subheader("Efficient Frontier with Key Portfolios")
-    fig = go.Figure()
+   
+    # Create tabs for different analysis sections
+    tab1, tab2, tab3, tab4 = st.tabs(["Efficient Frontier", "Portfolio Allocation","Performance Comparison", "Constituents"])
 
-    fig.add_trace(go.Scatter(
-        x=pfolio_volatility,
-        y=pfolio_return,
-        mode='markers',
-        name='All Portfolios',
-        marker=dict(color=sharpe_ratios, colorscale='Viridis', size=6, showscale=True),
-    ))
-    fig.add_trace(go.Scatter(
-        x=[pfolio_volatility[min_volatility_idx]],
-        y=[pfolio_return[min_volatility_idx]],
-        mode='markers+text',
-        name='Min Volatility',
-        marker=dict(color='green', size=10),
-        text='Min Volatility',
-        textposition='top center'
-    ))
-    fig.add_trace(go.Scatter(
-        x=[pfolio_volatility[max_return_idx]],
-        y=[pfolio_return[max_return_idx]],
-        mode='markers+text',
-        name='Max Return',
-        marker=dict(color='blue', size=10),
-        text='Max Return',
-        textposition='top center'
-    ))
-    fig.add_trace(go.Scatter(
-        x=[pfolio_volatility[max_sharpe_idx]],
-        y=[pfolio_return[max_sharpe_idx]],
-        mode='markers+text',
-        name='Max Sharpe Ratio',
-        marker=dict(color='red', size=10),
-        text='Max Sharpe',
-        textposition='top center'
-    ))
+    # Efficient Frontier Analysis
+    with tab1:
+        # Efficient Frontier Plot
+        st.subheader("Efficient Frontier")
+        st.markdown("""
+            **Modern Portfolio Theory (MPT)** identifies key portfolios on the efficient frontier, 
+            including the **maximum return portfolio**, the **minimum volatility portfolio**, and the 
+            **maximum Sharpe ratio portfolio**, each representing different trade-offs between 
+            risk and return. MPT underscores the importance of asset diversification to 
+            achieve the optimal balance between risk and return.
+        """)
+        st.markdown("""
+            The following plot visualizes the efficient frontier generated by Monte Carlo simulations, showing the relationship between 
+            portfolio return and volatility.
+        """)
+        # Display the number of Monte Carlo simulation runs
+        st.write(f"**Number of Monte Carlo simulation runs:** {no_of_iterations}")
+        fig = go.Figure()
 
-    fig.update_layout(
-        title='Efficient Frontier',
-        xaxis_title='Volatility (%)',
-        yaxis_title='Return (%)',
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-    )
-    st.plotly_chart(fig)
+        # Add all portfolios scatter plot
+        fig.add_trace(go.Scatter(
+            x=pfolio_volatility,
+            y=pfolio_return,
+            mode='markers',
+            name='All Portfolios',
+            marker=dict(
+                color=sharpe_ratios,
+                colorscale='Viridis',
+                size=6,
+                showscale=True,
+                colorbar=dict(title="Sharpe Ratio")
+            )
+        ))
 
-    # Display portfolio stats
-    # portfolios = [
-    #     ("Minimum Volatility Portfolio", weights[min_volatility_idx], pfolio_return[min_volatility_idx], pfolio_volatility[min_volatility_idx], sharpe_ratios[min_volatility_idx]),
-    #     ("Maximum Return Portfolio", weights[max_return_idx], pfolio_return[max_return_idx], pfolio_volatility[max_return_idx], sharpe_ratios[max_return_idx]),
-    #     ("Maximum Sharpe Ratio Portfolio", weights[max_sharpe_idx], pfolio_return[max_sharpe_idx], pfolio_volatility[max_sharpe_idx], sharpe_ratios[max_sharpe_idx]),
-    # ]
-    # if optimal_weights is not None and not np.any(np.isnan(optimal_weights)):
-    #     portfolios.append(("Optimized Portfolio", optimal_weights, None, None, None))
+        # Highlight Min Volatility Portfolio
+        fig.add_trace(go.Scatter(
+            x=[pfolio_volatility[min_volatility_idx]],
+            y=[pfolio_return[min_volatility_idx]],
+            mode='markers+text',
+            name='Min Volatility',
+            marker=dict(color='green', size=10),
+            text='Min Volatility',
+            textposition='top center'
+        ))
 
-    # for name, weights, ret, vol, sharpe in portfolios:
-    #     st.subheader(name)
-    #     weights_df = pd.DataFrame({"Asset": assets, "Weight": weights})
-    #     st.write(weights_df)
-    #     if ret is not None and vol is not None and sharpe is not None:
-    #         st.write(f"Portfolio Return: {ret:.2f}%")
-    #         st.write(f"Portfolio Volatility: {vol:.2f}%")
-    #         st.write(f"Sharpe Ratio: {sharpe:.4f}")
+        # Highlight Max Return Portfolio
+        fig.add_trace(go.Scatter(
+            x=[pfolio_volatility[max_return_idx]],
+            y=[pfolio_return[max_return_idx]],
+            mode='markers+text',
+            name='Max Return',
+            marker=dict(color='blue', size=10),
+            text='Max Return',
+            textposition='top center'
+        ))
 
-    # Plot cumulative returns
-    st.subheader("Cumulative Returns Comparison")
-    st.line_chart(cumprod_df)
+        # Highlight Max Sharpe Ratio Portfolio
+        fig.add_trace(go.Scatter(
+            x=[pfolio_volatility[max_sharpe_idx]],
+            y=[pfolio_return[max_sharpe_idx]],
+            mode='markers+text',
+            name='Max Sharpe Ratio',
+            marker=dict(color='red', size=10),
+            text='Max Sharpe',
+            textposition='top center'
+        ))
+
+        # Update layout for better visualization
+        fig.update_layout(
+            xaxis_title='Volatility (%)',
+            yaxis_title='Return (%)',
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            ),
+            template='plotly_white'
+        )
+
+        # Render Efficient Frontier plot
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with tab2:
+        # Prepare data for Portfolio Weights and Metrics Table
+        table2_data = {
+            "Portfolio": [
+                "Maximum Return Portfolio", 
+                "Minimum Volatility Portfolio", 
+                "Maximum Sharpe Ratio Portfolio"
+            ],
+            **{ticker: [] for ticker in assets_list},  # Initialize empty lists for each ticker
+            "Portfolio Return": [],
+            "Portfolio Volatility": [],
+            "Portfolio Sharpe Ratio": [],
+        }
+
+        # Define portfolios and their corresponding weights
+        portfolios = [
+            ("Maximum Return Portfolio", weights[np.argmax(pfolio_return)]),
+            ("Minimum Volatility Portfolio", weights[np.argmin(pfolio_volatility)]),
+            ("Maximum Sharpe Ratio Portfolio", weights[np.argmax(sharpe_ratios)]),
+        ]
+
+        # Populate the table with data
+        for name, portfolio_weights in portfolios:
+            portfolio_return, portfolio_volatility, portfolio_sharpe = portfolio_stats(
+                portfolio_weights, returns_assets_ann, returns_assets_cov, risk_free_rate
+            )
+            for i, ticker in enumerate(assets_list):
+                table2_data[ticker].append(f"{portfolio_weights[i]:.2f}")  # Add weight for each ticker
+            table2_data["Portfolio Return"].append(f"{portfolio_return * 100:.2f}%")
+            table2_data["Portfolio Volatility"].append(f"{portfolio_volatility * 100:.2f}%")
+            table2_data["Portfolio Sharpe Ratio"].append(f"{portfolio_sharpe:.4f}")
+
+        # Display the table with improved styling
+        st.subheader("Portfolio Allocation")
+
+        st.markdown("""
+            The table below presents three portfolios based on MPT, along with their 
+            corresponding asset weights and historical performance metrics.
+        """)
+
+
+        # Convert the table data into a pandas DataFrame for better control over styling
+        table2_df = pd.DataFrame(table2_data)
+
+        # Display the table with index (Portfolio) as rows
+        st.table(table2_df.set_index("Portfolio"))
+
+    with tab3: 
+
+        # Prepare cumulative product of returns for comparison
+        cumprod_df = returns_benchmark.copy()
+        cumprod_df.rename(columns={benchmark_index: benchmark_name}, inplace=True)
+        cumprod_df['Maximum Sharpe Ratio Portfolio'] = pfolio_returns_at_max_sharpe_weights
+        cumprod_df['Minimum Volatility Portfolio'] = pfolio_returns_at_min_vol_weights
+        cumprod_df['Maximum Return Portfolio'] = pfolio_returns_at_max_ret_weights
+
+        # Cumulative returns calculation
+        cumprod_df = (1 + cumprod_df).cumprod() - 1
+
+        # Cumulative Returns Plot
+        st.subheader("Performance Comparison")
+        st.markdown(f"""
+            The following plot shows the cumulative performance of each of the portfolios identified, 
+            compared to the {benchmark_name} index. 
+        """)
+
+
+        # Line Chart for cumulative returns comparison
+        fig = px.line(
+            cumprod_df,
+            labels={"value": "Cumulative Return", "index": "Date"},
+            line_shape='linear'
+        )
+
+        fig.update_traces(mode='lines', line=dict(width=2))
+
+        fig.update_layout(
+            xaxis_title="Date",
+            yaxis_title="Cumulative Return (%)",
+            template='plotly_white',
+            plot_bgcolor='rgba(245, 245, 245, 0.85)',
+            hovermode='x unified',
+            hoverlabel=dict(bgcolor="white", font_size=12),
+            legend=dict(
+                x=0,                 # Move to left side
+                y=1,                 # Move to top
+                xanchor='left',
+                yanchor='top',
+                bgcolor='rgba(255, 255, 255, 0.7)',  # Optional: background color
+                bordercolor='Black', # Optional: border color
+                borderwidth=1        # Optional: border width
+            )
+        )
+
+
+        # Show the plot
+        st.plotly_chart(fig, use_container_width=True)
+
+    with tab4:
+       st.markdown("The table and heatmap below shows the CAGR, Volatility, Sharpe Ratio as well as correlation between constituent assets of the portfolio:")
+       generate_asset_and_portfolio_tables(
+        assets_list, 
+        returns_assets_ann, 
+        returns_assets, 
+        risk_free_rate, 
+        optimal_weights, 
+        weights, 
+        pfolio_return, 
+        pfolio_volatility, 
+        sharpe_ratios, 
+        returns_all_corr,
+        returns_assets_cov
+    ) 
+
+import seaborn as sns
+def generate_asset_and_portfolio_tables(
+    assets_list, 
+    returns_assets_ann, 
+    returns_assets, 
+    risk_free_rate, 
+    optimal_weights, 
+    weights, 
+    pfolio_return, 
+    pfolio_volatility, 
+    sharpe_ratios, 
+    returns_all_corr,
+    returns_assets_cov
+):
+    # Prepare data for Table 1: Return, Volatility, Sharpe Ratio of Each Asset
+    table1_data = {
+        "Metric": ["Average Return", "Average Volatility", "Sharpe Ratio"]
+    }
+    
+    for ticker in assets_list:
+        asset_return = returns_assets_ann[ticker].mean()
+        asset_volatility = returns_assets[ticker].std() * (250 ** 0.5)
+        asset_sharpe = (asset_return - risk_free_rate) / asset_volatility
+
+        table1_data[ticker] = [
+            f"{asset_return * 100:.2f}%",  # Average Return in percentage
+            f"{asset_volatility * 100:.2f}%",  # Average Volatility in percentage
+            f"{asset_sharpe:.4f}",  # Sharpe Ratio
+        ]
+
+    # Display Table 1
+    st.subheader("Asset Metrics")
+    table1_df = pd.DataFrame(table1_data)
+    st.table(table1_df.set_index("Metric"))
+
+    # Correlation Heatmap
+    st.subheader("Asset Correlation Heatmap:")
+    fig = plt.figure(figsize=(15, 8))
+    sns.heatmap(returns_all_corr, annot=True, cmap='coolwarm', fmt='.2f')
+    st.pyplot(fig)  # Display the heatmap in Streamlit
+
+
 
 
 
