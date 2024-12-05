@@ -1,9 +1,6 @@
 import streamlit as st
 import utils
 import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import seaborn as sns
 
 # Header section
 st.markdown(
@@ -88,7 +85,7 @@ if assets_list is not None:
         None
     else:
         returns_assets, returns_assets_ann, returns_assets_cov, returns_benchmark, returns_all_corr = utils.return_stats(
-            adj_close, benchmark_df, combined_df, assets_list, benchmark_index, no_of_years
+            adj_close, benchmark_df, combined_df
         )
 
         # Perform Efficient Frontier Analysis
@@ -101,11 +98,15 @@ if assets_list is not None:
 
         # Outputs
         # Output Results
-        utils.opt_portfolio_results(optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_cagr_valid)
+        utils.opt_portfolio_results(
+            optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_cagr_valid
+        )
         
         # Visualize Results
         plt.style.use('bmh')
-        utils.visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios, returns_assets, optimal_weights, returns_benchmark, benchmark_name, benchmark_index, no_of_iterations, assets_list, returns_assets_ann, returns_all_corr, returns_assets_cov, risk_free_rate)
+        utils.visualize_analyses(
+            pfolio_volatility, pfolio_return, weights, sharpe_ratios, returns_assets, optimal_weights, returns_benchmark, benchmark_name, benchmark_index, no_of_iterations, assets_list, returns_assets_ann, returns_all_corr, returns_assets_cov, risk_free_rate
+        )
 
 else:
     None 

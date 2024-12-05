@@ -6,7 +6,7 @@ import numpy as np
 
 # Function to generate random inputs
 def generate_random_inputs():
-    # Generate random stock tickers
+    # Sample stock database
     sample_assets = {
     "AAPL": "Apple Inc.",  # Tech stock
     "MSFT": "Microsoft Corp.",  # Tech stock
@@ -42,8 +42,9 @@ def generate_random_inputs():
     "VZ": "Verizon Communications Inc.",  # Communication Services
     }
 
+    # Select random tickers
     size = np.random.randint(3,11)
-    assets_list = np.random.choice(list(sample_assets.keys()), size=size, replace=False)  # Select random tickers
+    assets_list = np.random.choice(list(sample_assets.keys()), size=size, replace=False)  
     
     st.markdown("##### Preparing random tickers...")
     st.markdown(f"**Tickers selected**: {(', ').join(assets_list)}")
@@ -72,12 +73,13 @@ def assets(user_input):
     valid_assets = []
     stock_names = {}
 
+    # Check if data exists for the ticker
     for ticker in input_split:
         try:
             stock = yf.Ticker(ticker)
             stock_data = stock.history(period="1mo")
             stock_name = stock.info.get("longName")
-            if stock_data.empty:  # Check if data exists for the ticker
+            if stock_data.empty:  
                 invalid_tickers.append(ticker)
             else:
                 valid_assets.append(ticker)
@@ -152,7 +154,7 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     # Outputs
     # Separator line
     st.markdown('________________________________________________________________________')
-    st.markdown("<h2 style='text-align:center;'><u>Analysis</u></h2>",
+    st.markdown("<h2 style='text-align:center;'><u>Report</u></h2>",
     unsafe_allow_html=True,)
     st.markdown(f'##### The following analysis was conducted on {no_of_years}Y daily adjusted closing price data from Yahoo Finance.')
     st.markdown(f'**Time period of analysis:**    {(start_date).strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}')
@@ -164,7 +166,7 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
         
     return adj_close, benchmark_df, combined_df, benchmark_name
 
-def return_stats(adj_close, benchmark_df, combined_df, assets, benchmark_index, no_of_years):
+def return_stats(adj_close, benchmark_df, combined_df):
     """
     Calculates return statistics (annualized returns, volatility, covariance, and correlation) for assets and a benchmark.
     Returns pd DataFrames.
@@ -173,44 +175,13 @@ def return_stats(adj_close, benchmark_df, combined_df, assets, benchmark_index, 
     returns_assets = adj_close.pct_change().dropna()
     returns_assets_ann = returns_assets * 250   # annualised
     returns_assets_cov = returns_assets.cov() * 250
-
-    # Calculate mean of Annualized Total Returns and Volatility of the assets
-    ann_total_returns_mean = returns_assets_ann.mean()
-    ann_volatility_mean = (returns_assets.std() * 250 ** 0.5).mean()
     
     # Calculate simple returns of the benchmark
     returns_benchmark = benchmark_df.pct_change().dropna()
 
     # Create a df with both assets and benchmark combined 
     returns_all = combined_df.pct_change().dropna()
-    returns_all_ann = returns_all * 250
     returns_all_corr = returns_all.corr()
-    
-    # Header
-    # st.markdown("### I. Individual Asset Analysis:")
-
-    # Tickers (including the benchmark index)
-    tickers = assets + [benchmark_index]
-
-    # CAGR Table (Daily Compounding)
-    cagr_data = [(ticker, f"{mean*100:.2f}%") for ticker, mean in zip(tickers, returns_all.mean())]
-    cagr_df = pd.DataFrame(cagr_data, columns=["Asset", f"{no_of_years}-Year CAGR (Daily Compounding)"])
-    # st.subheader(f"CAGR Table ({no_of_years}-Year Daily Compounding):")
-    # st.table(cagr_df)
-
-    # Display Average (excluding benchmark)
-    avg_cagr = ann_total_returns_mean.mean() * 100
-    # st.markdown(f"**Average CAGR (excluding {benchmark_index}):** {avg_cagr:.2f}%")
-
-    # Volatility Table
-    volatility_data = [(ticker, f"{(std * 100 * 250 ** 0.5):.2f}%") for ticker, std in zip(tickers, returns_all.std())]
-    volatility_df = pd.DataFrame(volatility_data, columns=["Asset", "Annualized Volatility"])
-    # st.subheader("Volatility Table:")
-    # st.table(volatility_df)
-
-    # Display Average Volatility (excluding benchmark)
-    avg_volatility = ann_volatility_mean.mean() * 100
-    # st.markdown(f"**Average Volatility (excluding {benchmark_index}):** {avg_volatility:.2f}%")
     
     return returns_assets, returns_assets_ann, returns_assets_cov, returns_benchmark, returns_all_corr
 
@@ -278,19 +249,22 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
     n = len(returns_assets_ann.columns)  # Number of assets (columns in the dataframe)
     w = cp.Variable(n)  # Portfolio weights as a cvxpy variable
 
-    # Check if the input target_cagr is feasible (it needs to be equal to or lower than the max average return of individual assets)
+    # Check if the input target_cagr is feasible (it needs to be lower than the max average return of individual assets and higher than the min average return)
     max_expected_return = returns_assets_ann.mean().max()
     min_expected_return = returns_assets_ann.mean().min()
 
     if target_cagr > max_expected_return:
         st.error(f"Warning: The target CAGR of {target_cagr*100:.2f}% exceeds the maximum feasible portfolio CAGR of {max_expected_return*100:.2f}%, which is based on the highest historical return of the portfolio's assets during this time period.")
         st.success(f"CAGR has been adjusted to the maximum feasible return of {(max_expected_return - 0.0001)*100:.2f}%.")
+        
         target_cagr_valid = max_expected_return - 0.0001  # Adjust target_cagr to the highest feasible value
+
     elif target_cagr < min_expected_return:
         st.warning(f"Warning: The target CAGR of {target_cagr*100:.2f}% is below the minimum feasible return of {min_expected_return*100:.2f}%, which is based on the lowest historical return of the portfolio's assets during this time period.")
         st.success(f"CAGR has been adjusted to the minimum feasible return of {(min_expected_return + 0.0001)*100:.2f}%.")
 
         target_cagr_valid = min_expected_return + 0.0001  # Adjust target_cagr to the lowest feasible value
+
     else:
         target_cagr_valid = target_cagr
 
@@ -400,7 +374,7 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
     st.markdown("<h2><u>Modern Portfolio Theory</u></h2>", unsafe_allow_html=True)
 
    
-    # Create tabs for different analysis sections
+    # Create tabs for different sections
     tab1, tab2, tab3, tab4 = st.tabs(["Efficient Frontier", "Portfolio Allocation","Performance Comparison", "Constituents"])
 
     # Efficient Frontier Analysis
@@ -487,6 +461,7 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
         # Render Efficient Frontier plot
         st.plotly_chart(fig, use_container_width=True)
     
+    # Portfolio Allocation
     with tab2:
         # Prepare data for Portfolio Weights and Metrics Table
         table2_data = {
@@ -495,7 +470,7 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
                 "Minimum Volatility Portfolio", 
                 "Maximum Sharpe Ratio Portfolio"
             ],
-            **{ticker: [] for ticker in assets_list},  # Initialize empty lists for each ticker
+            **{ticker: [] for ticker in assets_list},  
             "Portfolio Return": [],
             "Portfolio Volatility": [],
             "Portfolio Sharpe Ratio": [],
@@ -514,12 +489,12 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
                 portfolio_weights, returns_assets_ann, returns_assets_cov, risk_free_rate
             )
             for i, ticker in enumerate(assets_list):
-                table2_data[ticker].append(f"{portfolio_weights[i]:.2f}")  # Add weight for each ticker
+                table2_data[ticker].append(f"{portfolio_weights[i]:.2f}")  
             table2_data["Portfolio Return"].append(f"{portfolio_return * 100:.2f}%")
             table2_data["Portfolio Volatility"].append(f"{portfolio_volatility * 100:.2f}%")
             table2_data["Portfolio Sharpe Ratio"].append(f"{portfolio_sharpe:.4f}")
 
-        # Display the table with improved styling
+        # Display the table 
         st.subheader("Portfolio Allocation")
 
         st.markdown("""
@@ -527,13 +502,13 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
             corresponding asset weights and historical performance metrics.
         """)
 
-
         # Convert the table data into a pandas DataFrame for better control over styling
         table2_df = pd.DataFrame(table2_data)
 
         # Display the table with index (Portfolio) as rows
         st.table(table2_df.set_index("Portfolio"))
 
+    # Performance comparison
     with tab3: 
 
         # Prepare cumulative product of returns for comparison
@@ -575,30 +550,24 @@ def visualize_analyses(pfolio_volatility, pfolio_return, weights, sharpe_ratios,
                 y=1,                 # Move to top
                 xanchor='left',
                 yanchor='top',
-                bgcolor='rgba(255, 255, 255, 0.7)',  # Optional: background color
-                bordercolor='Black', # Optional: border color
-                borderwidth=1        # Optional: border width
+                bgcolor='rgba(255, 255, 255, 0.7)',  # background color
+                bordercolor='Black', 
+                borderwidth=1        
             )
         )
-
 
         # Show the plot
         st.plotly_chart(fig, use_container_width=True)
 
+    # Constituents
     with tab4:
-       st.markdown("The table and heatmap below shows the CAGR, Volatility, Sharpe Ratio as well as correlation between constituent assets of the portfolio:")
+       st.subheader("Constituent Assets")
        generate_asset_and_portfolio_tables(
         assets_list, 
         returns_assets_ann, 
         returns_assets, 
         risk_free_rate, 
-        optimal_weights, 
-        weights, 
-        pfolio_return, 
-        pfolio_volatility, 
-        sharpe_ratios, 
-        returns_all_corr,
-        returns_assets_cov
+        returns_all_corr
     ) 
 
 import seaborn as sns
@@ -607,13 +576,7 @@ def generate_asset_and_portfolio_tables(
     returns_assets_ann, 
     returns_assets, 
     risk_free_rate, 
-    optimal_weights, 
-    weights, 
-    pfolio_return, 
-    pfolio_volatility, 
-    sharpe_ratios, 
-    returns_all_corr,
-    returns_assets_cov
+    returns_all_corr
 ):
     # Prepare data for Table 1: Return, Volatility, Sharpe Ratio of Each Asset
     table1_data = {
@@ -626,21 +589,22 @@ def generate_asset_and_portfolio_tables(
         asset_sharpe = (asset_return - risk_free_rate) / asset_volatility
 
         table1_data[ticker] = [
-            f"{asset_return * 100:.2f}%",  # Average Return in percentage
-            f"{asset_volatility * 100:.2f}%",  # Average Volatility in percentage
-            f"{asset_sharpe:.4f}",  # Sharpe Ratio
+            f"{asset_return * 100:.2f}%",  
+            f"{asset_volatility * 100:.2f}%",  
+            f"{asset_sharpe:.4f}", 
         ]
 
     # Display Table 1
-    st.subheader("Asset Metrics")
+    st.markdown("The table below shows the CAGR, Volatility, Sharpe Ratio of constituent assets of the portfolio:")
+    st.markdown("##### Asset Metrics")
     table1_df = pd.DataFrame(table1_data)
     st.table(table1_df.set_index("Metric"))
 
     # Correlation Heatmap
-    st.subheader("Asset Correlation Heatmap:")
+    st.markdown("##### Asset Correlation Heatmap:")
     fig = plt.figure(figsize=(15, 8))
     sns.heatmap(returns_all_corr, annot=True, cmap='coolwarm', fmt='.2f')
-    st.pyplot(fig)  # Display the heatmap in Streamlit
+    st.pyplot(fig)  
 
 
 
