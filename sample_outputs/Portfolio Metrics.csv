@@ -1,0 +1,4 @@
+﻿Portfolio,AAPL,SLB,VZ,AMZN,Portfolio Return,Portfolio Volatility,Portfolio Sharpe Ratio
+Maximum Return Portfolio,0.24,0.01,0.03,0.72,29.33%,27.97%,0.9021
+Minimum Volatility Portfolio,0.19,0.08,0.62,0.11,12.53%,17.00%,0.4961
+Maximum Sharpe Ratio Portfolio,0.48,0.01,0.03,0.48,28.29%,26.20%,0.9232
