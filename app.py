@@ -18,11 +18,12 @@ st.markdown(
 )
 
 st.markdown(
-    "<p style='text-align:center; font-size: 16px; color: #333; margin-top: 20px;'>"
+    "<p style='text-align:center; font-size: 14px; color: #666; margin-top: 10px;'>"
     "View sidebar for developer info and disclaimer"
     "</p>",
     unsafe_allow_html=True,
 )
+
 
 # Sidebar disclaimer
 with st.sidebar:
