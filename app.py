@@ -1,6 +1,7 @@
 import streamlit as st
-import utils
-import matplotlib.pyplot as plt
+import utils.data_processing as dp
+import utils.optimization as opt
+import utils.visualization as vis
 
 # Header section
 st.markdown(
@@ -9,7 +10,7 @@ st.markdown(
 )
 st.markdown(
     "<p style='text-align:center; font-size: 18px;'>This is a Python-based application for analyzing and optimizing financial portfolios. "
-    "It uses modern portfolio theory and convex optimization techniques to identify optimal allocations and visualize performances.</p>",
+    "It uses modern portfolio theory and convex optimization techniques to identify optimal allocations, backtest performance, and visualize results.</p>",
     unsafe_allow_html=True,
 )
 
@@ -37,9 +38,19 @@ target_cagr = st.slider(
 with st.expander("Additional Settings"):
     benchmark_index = st.selectbox(
     "Select an index to benchmark the portfolio:",
-    ["^GSPC", "^DJI", "^IXIC"],
+    ["^IXIC", "^GSPC", "^DJI"],
     key="benchmark_index",
-    help="Performance of your portfolio will be benchmarked against this index's performance over the past 10 years."
+    help="Performance of your portfolio will be benchmarked against this index's performance over the time period of analysis."
+    )
+
+    no_of_years = st.slider(
+        "Period of analysis (years):",
+        min_value=1,
+        max_value=10,
+        value=5,
+        step=1,
+        key="no_of_years",
+        help="The number of years of historical data that will be retrieved to conduct the analysis."
     )
 
     risk_free_rate = st.slider(
@@ -67,44 +78,42 @@ assets_list = None
 
 # Logic for Custom Inputs after validation
 if run_button:
-    assets_list = utils.run_button(user_input)
+    assets_list = dp.run_button(user_input)
 # Logic for random Inputs 
 elif random_button:
-    assets_list = utils.random_button()
+    assets_list = dp.random_button()
 
-no_of_years = 10            # Number of years of historical data to be used for analysis
 no_of_iterations = 1000     # Number of Monte Carlo simulations
 
 
 if assets_list is not None:
     # Retrieve Data
-    adj_close, benchmark_df, combined_df, benchmark_name = utils.retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years)
+    adj_close, benchmark_df, combined_df, benchmark_name = dp.retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years)
 
     # Calculate Returns and Risk Statistics
     if adj_close is None or benchmark_df is None or combined_df is None or benchmark_name is None:
         None
     else:
-        returns_assets, returns_assets_ann, returns_assets_cov, returns_benchmark, returns_all_corr = utils.return_stats(
+        returns_assets, returns_assets_ann, returns_assets_cov, returns_benchmark, returns_all_corr = opt.return_stats(
             adj_close, benchmark_df, combined_df
         )
 
         # Perform Efficient Frontier Analysis
-        pfolio_volatility, pfolio_return, weights, sharpe_ratios = utils.eff_frontier(
+        pfolio_volatility, pfolio_return, weights, sharpe_ratios = opt.eff_frontier(
             assets_list, returns_assets_ann, returns_assets_cov, risk_free_rate, no_of_iterations
         )
 
         # Optimize Portfolio Using Mean-Variance Optimization
-        optimal_weights, target_cagr_valid = utils.opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr)
+        optimal_weights, target_cagr_valid = opt.opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr)
 
         # Outputs
         # Output Results
-        utils.opt_portfolio_results(
+        vis.opt_portfolio_results(
             optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_cagr_valid
         )
         
         # Visualize Results
-        plt.style.use('bmh')
-        utils.visualize_analyses(
+        vis.visualize_analyses(
             pfolio_volatility, pfolio_return, weights, sharpe_ratios, returns_assets, optimal_weights, returns_benchmark, benchmark_name, benchmark_index, no_of_iterations, assets_list, returns_assets_ann, returns_all_corr, returns_assets_cov, risk_free_rate
         )
 
