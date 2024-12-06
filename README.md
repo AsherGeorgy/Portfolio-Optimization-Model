@@ -1,98 +1,108 @@
-# Portfolio Optimization Tool
+# Portfolio Optimization Model
 
 ## Overview
-The **Portfolio Optimization Tool** is a Python-based application for analyzing and optimizing financial portfolios. Portfolio optimization is the process of selecting the best distribution of investments to maximize returns for a given level of risk, based on historical data. This tool uses modern portfolio theory to identify optimal allocations and visualize performance.
-
-Key features include:
-- Mean-Variance Optimization using convex programming.
-- Monte Carlo simulations for efficient frontier analysis.
-- Interactive visualizations with Plotly.
+A Python-based application for analyzing and optimizing financial portfolios using **Modern Portfolio Theory** (MPT) and **convex optimization**. This tool allows users to configure their portfolio, analyze risk and returns, and visualize key metrics such as the Efficient Frontier, portfolio allocations, and performance comparisons.
 
 ## Features
-- **Asset Analysis**: Calculate returns, volatility, and correlations for selected assets.
-- **Efficient Frontier**: Simulate thousands of portfolio combinations to identify optimal allocations.
-- **Portfolio Optimization**: Optimize weights for minimum risk or target return.
-- **Benchmark Comparison**: Analyze portfolio performance relative to a chosen benchmark.
 
-## Requirements
-- Python 3.7 or higher
-- Required libraries:
-  - `numpy`
-  - `pandas`
-  - `matplotlib`
-  - `plotly`
-  - `seaborn`
-  - `yfinance`
-  - `fredapi`
-  - `cvxpy`
-  - `tabulate`
+### Portfolio Configuration:
+- Input custom stock tickers or use randomly generated tickers.
+- Select benchmark indices and specify target metrics like CAGR and risk-free rates.
 
-Install dependencies using:
-```bash
-pip install -r requirements.txt
-```
+### Data Processing:
+- Retrieves historical stock and benchmark data from Yahoo Finance.
+- Validates tickers and calculates financial metrics such as annualized returns, covariance, and correlation.
+
+### Portfolio Optimization:
+- Employs convex optimization to allocate weights based on user-defined target returns while minimizing risk.
+- Identifies key portfolios (e.g., Maximum Sharpe Ratio, Minimum Volatility).
+
+### Visualization:
+- Plots the Efficient Frontier and portfolio performance.
+- Displays cumulative return comparisons and asset correlation heatmaps.
+
+### User-Friendly Interface:
+- Clean, intuitive UI built with [Streamlit](https://streamlit.io/).
+- Sidebar includes developer information and disclaimers.
+
 ## Installation
-1. Clone the repository:
+
+### 1. Clone the repository:
 ```bash
 git clone https://github.com/ashergeorgy/portfolio-optimization-tool.git
 cd portfolio-optimization-tool
 ```
-2. Install dependencies:
+### 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
-## Usage
-Run the tool with:
-
+### 3. Run the app:
 ```bash
-python main.py
+streamlit run app.py
 ```
 
-## Steps:
-1. **Input Assets**: Provide stock tickers or use the default portfolio.
-2. **Set Benchmark**: Choose a benchmark index (e.g., S&P 500).
-3. **Set Parameters**: Define the risk-free rate and target return.
-4. **Analyze Results**: View detailed analysis, visualizations, and save outputs.
+## How to Use
 
-## Example:
-For a portfolio of Apple, Google, and Microsoft with a target return of 8%:
+### Configure Your Portfolio:
+- Input stock tickers (`e.g., aapl, msft, tsla`) or use the "Test with random tickers" button.
+- Adjust settings such as target CAGR, benchmark index, analysis period, and risk-free rate.
 
-```bash
-Enter stock tickers (separate by commas): AAPL, GOOGL, MSFT
-Select benchmark index: ^GSPC = 0; ^DJI = 1; ^IXIC = 2: 0
-Enter FRED API key (Press Enter to skip): 
-Enter desired minimum return for convex optimization (default is 8.0%): 8
-```
+### Run Optimization:
+- Click "Run" to perform portfolio analysis and optimization.
+- View the results, including optimized weights, key portfolios, and performance charts.
 
-## Outputs
-- **Optimized Portfolio Weights**: Saved as ``optimized_portfolio_weights.csv``, containing asset weights in the optimized portfolio.
-- **Efficient Frontier Data**: Saved as efficient_frontier.csv, containing volatility, returns, and Sharpe Ratio for simulations.
-- **Visualizations**: Interactive plots for the efficient frontier and performance comparisons.
+### Explore Results:
+- Analyze the Efficient Frontier, asset allocations, and correlation heatmaps.
+- Compare the performance of your portfolio against the selected benchmark.
+
+## Demo
+[Insert GIF or screenshots of the app in action, e.g., the Efficient Frontier plot, performance comparison chart, etc.]
+
+## Technologies Used
+- **Programming Language:** Python
+- **Web Framework:** Streamlit
+- **Data Sources:** Yahoo Finance (via yfinance)
+- **Optimization Library:** CVXPY
+- **Visualization:** Plotly, Seaborn, Matplotlib
 
 ## Project Structure
 ```bash
-portfolio-optimization-tool/
+Portfolio-Optimization-Model/
 │
-├── main.py                   # Main script for portfolio optimization
-├── requirements.txt          # List of dependencies
-├── LICENSE                   # License information 
-├── README.md                 # Project documentation
-├── .gitignore                # Files and directories to ignore in Git
-└── sample_output/            # Folder containing sample outputs
-    ├── optimized_portfolio_weights.csv
-    ├── efficient_frontier.csv
-    ├── efficient_frontier_plot.png
-    └── performance_comparison.png   
+├── .devcontainer/                # Dev container configuration 
+│   └── devcontainer.json
+│
+├── .streamlit/                   # Streamlit-specific configuration
+│   └── config.toml
+│
+├── app.py                        # Main application script 
+│
+├── legacy/                       # Legacy implementation
+│   └── main.py
+│
+├── utils/                         # Utility scripts for data processing, optimization, and visualization
+│   ├── data_processing.py
+│   ├── optimization.py
+│   └── visualization.py
+│
+├── sample_outputs/               # Folder for sample outputs and results (CSV, images)
+│   ├── Constituent Asset Correlation.png
+│   ├── Constituent Asset Metrics.csv
+│   ├── Efficient Frontier.png
+│   ├── Efficient Portfolios Backtest.png
+│   ├── Optimized Portfolio Backtest.png
+│   ├── Optimized Portfolio Weights.csv
+│   └── Portfolio Metrics.csv
+│
+├── .gitignore                    # Specifies files to ignore in version control
+├── LICENSE                       # License file 
+├── README.md                     # Project documentation and instructions
+├── requirements.txt              # Python dependencies for the project
+└── README.md                     # Project documentation and instructions
 ```
 
-## Troubleshooting
-- **Missing data for some tickers**: Ensure you entered valid stock tickers and have a stable internet connection.
-- **Dependency issues**: Run `pip install -r requirements.txt` to reinstall dependencies.
-
-## Contributing
-Contributions are welcome! Please submit a pull request or open an issue.
+## Disclaimers
+This application is for educational and informational purposes only. The analysis and results provided are based on historical data and theoretical models. They do not predict future performance. Users should conduct their own due diligence and consult with a qualified financial advisor before making any investment decisions.
 
 ## License
-
-This project is licensed under the MIT License. See LICENSE for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
