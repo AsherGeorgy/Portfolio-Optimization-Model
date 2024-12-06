@@ -17,6 +17,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown(
+    "<p style='text-align:center; font-size: 16px; color: #333; margin-top: 20px;'>"
+    "View sidebar for developer info and disclaimer"
+    "</p>",
+    unsafe_allow_html=True,
+)
 
 # Sidebar disclaimer
 with st.sidebar:
@@ -38,7 +44,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Link to full disclaimer
-    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeo/full-disclaimer' target='_blank' style='color: #007BFF; text-decoration: none;'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeorgy.github.io/full-disclaimer' target='_blank' style='color: #007BFF; text-decoration: none;'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
 
 # Separator line
 st.markdown("<hr style='border: 1px solid #003366;'>", unsafe_allow_html=True)
