@@ -3,6 +3,8 @@
 import streamlit as st
 import yfinance as yf
 import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
 
 # Inputs
 
@@ -48,13 +50,13 @@ def generate_random_inputs():
     size = np.random.randint(3,11)
     assets_list = np.random.choice(list(sample_assets.keys()), size=size, replace=False)  
     
-    st.markdown("##### Preparing random tickers...")
-    st.markdown(f"**Tickers selected**: {(', ').join(assets_list)}")
+    st.markdown("<h5 style='color: #003366;'>Preparing random tickers...</h5>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color: #003366;'><strong>Tickers selected</strong>: {', '.join(assets_list)}</span>", unsafe_allow_html=True)
     for ticker in assets_list:
         st.success(f"Ticker validated: {sample_assets[ticker]} ({ticker}) ")
 
     st.markdown('________________________________________________________________________')
-    st.markdown("##### Running optimization...")
+    st.markdown("<h5 style='color: #003366;'>Running optimization...</h5>", unsafe_allow_html=True)
 
     return assets_list
 
@@ -116,8 +118,7 @@ def random_button():
 
 
 # Processes
-import pandas as pd
-from datetime import datetime, timedelta
+
 
 def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):  
     # Determine start_date and end_date based on no_of_years
@@ -156,14 +157,14 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     # Outputs
     # Separator line
     st.markdown('________________________________________________________________________')
-    st.markdown("<h2 style='text-align:center;'><u>Report</u></h2>",
+    st.markdown("<h2 style='text-align:center; color: #003366;'><u>Report</u></h2>",
     unsafe_allow_html=True,)
-    st.markdown(f'##### The following analysis was conducted on {no_of_years}Y daily adjusted closing price data from Yahoo Finance.')
-    st.markdown(f'**Time period of analysis:**    {(start_date).strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}')
-    st.markdown(f'**Index used as benchmark:**    {benchmark_name}')
-    st.markdown(f'**Risk free rate used:**        {risk_free_rate*100:.2f}%')
-    st.markdown(f'**Assets analysed:**           {",  ".join(asset_names)}')
-    st.markdown(f'**Techniques used:**           Convex Optimization, Modern Portfolio Theory')
+    st.markdown(f"<h5 style='color: #003366;'>The following analysis was conducted on {no_of_years}Y daily adjusted closing price data from Yahoo Finance.</h5>", unsafe_allow_html=True)
+    st.markdown("<span style='color: #003366;'><strong>Time period of analysis:</strong></span> " + f"{(start_date).strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}", unsafe_allow_html=True)
+    st.markdown("<span style='color: #003366;'><strong>Index used as benchmark:</strong></span> " + f"{benchmark_name}", unsafe_allow_html=True)
+    st.markdown("<span style='color: #003366;'><strong>Risk free rate used:</strong></span> " + f"{risk_free_rate*100:.2f}%", unsafe_allow_html=True)
+    st.markdown("<span style='color: #003366;'><strong>Assets analysed:</strong></span> " + f"{',  '.join(asset_names)}", unsafe_allow_html=True)
+    st.markdown("<span style='color: #003366;'><strong>Techniques used:</strong></span> " + "Convex Optimization, Modern Portfolio Theory", unsafe_allow_html=True)
     st.markdown('________________________________________________________________________')
         
     return adj_close, benchmark_df, combined_df, benchmark_name
