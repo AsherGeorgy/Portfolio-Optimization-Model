@@ -77,9 +77,10 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
     """
 
      # Display the portfolio optimization results
-    st.markdown("<h2><u>Convex Optimization</u></h2>",
-    unsafe_allow_html=True,)
-    st.markdown(f"#####  **Results**:")
+    st.markdown("<h2 style='color: #003366;'><u>Convex Optimization</u></h2>", unsafe_allow_html=True)
+    st.markdown("<h5 style='color: #003366;'>Results:</h5>", unsafe_allow_html=True)
+
+
 
     # Initialize variables
     n = len(returns_assets_ann.columns)  # Number of assets (columns in the dataframe)
