@@ -5,25 +5,12 @@ A Python-based application for analyzing and optimizing financial portfolios usi
 
 ## Features
 
-### Portfolio Configuration:
-- Input custom stock tickers or use randomly generated tickers.
-- Select benchmark indices and specify target metrics like CAGR and risk-free rates.
+- **Portfolio Configuration**: Input custom or random tickers, select benchmark indices, and define target metrics (CAGR, risk-free rate).
+- **Data Processing**: Retrieves and validates historical data from Yahoo Finance, calculating key metrics like returns, covariance, and correlation.
+- **Portfolio Optimization**: Uses convex optimization to allocate weights for target returns, identifying key portfolios (e.g., Maximum Sharpe Ratio, Minimum Volatility).
+- **Visualization**: Plots Efficient Frontier, portfolio performance, cumulative return comparisons, and asset correlation heatmaps.
+- **User Interface**: Intuitive, clean UI built with [Streamlit](https://streamlit.io/), featuring a sidebar for developer info and disclaimers.
 
-### Data Processing:
-- Retrieves historical stock and benchmark data from Yahoo Finance.
-- Validates tickers and calculates financial metrics such as annualized returns, covariance, and correlation.
-
-### Portfolio Optimization:
-- Employs convex optimization to allocate weights based on user-defined target returns while minimizing risk.
-- Identifies key portfolios (e.g., Maximum Sharpe Ratio, Minimum Volatility).
-
-### Visualization:
-- Plots the Efficient Frontier and portfolio performance.
-- Displays cumulative return comparisons and asset correlation heatmaps.
-
-### User-Friendly Interface:
-- Clean, intuitive UI built with [Streamlit](https://streamlit.io/).
-- Sidebar includes developer information and disclaimers.
 
 ## Installation
 
