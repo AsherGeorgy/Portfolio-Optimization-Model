@@ -45,7 +45,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Link to full disclaimer
-    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://github.com/AsherGeorgy/Portfolio-Optimization-Model/blob/main/Limitations%20and%20Disclaimer.md' target='_blank' style='color: #007BFF; text-decoration: none;'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeorgy.github.io/documents/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
 
 # Separator line
 st.markdown("<hr style='border: 1px solid #003366;'>", unsafe_allow_html=True)
