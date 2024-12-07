@@ -12,7 +12,7 @@ st.markdown(
 )
 st.markdown(
     "<p style='text-align:center; font-size: 15px;'>"
-    "<a href='https://github.com/AsherGeorgy/portfolio-optimization-tool/tree/streamlit_app' target='_blank'>View Source Code on GitHub</a>"
+    "<a href='https://github.com/AsherGeorgy/Portfolio-Optimization-Model/tree/main' target='_blank'>View Source Code on GitHub</a>"
     "</p>",
     unsafe_allow_html=True,
 )
@@ -45,7 +45,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Link to full disclaimer
-    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeorgy.github.io/full-disclaimer' target='_blank' style='color: #007BFF; text-decoration: none;'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://github.com/AsherGeorgy/Portfolio-Optimization-Model/blob/main/Limitations%20and%20Disclaimer.md' target='_blank' style='color: #007BFF; text-decoration: none;'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
 
 # Separator line
 st.markdown("<hr style='border: 1px solid #003366;'>", unsafe_allow_html=True)
