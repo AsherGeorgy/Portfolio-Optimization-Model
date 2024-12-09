@@ -43,7 +43,7 @@ streamlit run app.py
 - Compare the performance of your portfolio against the selected benchmark.
 
 ## Demo
-[Insert GIF or screenshots of the app in action, e.g., the Efficient Frontier plot, performance comparison chart, etc.]
+![Interactive Eff Frontier](sample_outputs/Efficient%20Portfolios%20Backtest.png)
 
 ## Technologies Used
 - **Programming Language:** Python
