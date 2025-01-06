@@ -3,22 +3,29 @@ import utils.data_processing as dp
 import utils.optimization as opt
 import utils.visualization as vis
 
+st.markdown(
+    "<p style='text-align:center; font-size: 0.9rem; font-style:italic; color: #666; margin-top: 0.625rem;'>"
+    "For the best experience, please switch to landscape mode if you're using a mobile device."
+    "</p>",
+    unsafe_allow_html=True,
+)
+
 # Header section
 st.markdown("<h1 style='text-align:center; color:#003366;'>Portfolio Optimization Model</h1>", unsafe_allow_html=True)
 st.markdown(
-    "<p style='text-align:center; font-size: 18px;'>This is a Python-based application for analyzing and optimizing financial portfolios. "
+    "<p style='text-align:center; font-size: 1.125rem;'>This is a Python-based application for analyzing and optimizing financial portfolios. "
     "It uses modern portfolio theory and convex optimization techniques to identify optimal allocations, backtest performance, and visualize results.</p>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p style='text-align:center; font-size: 15px;'>"
+    "<p style='text-align:center; font-size: 0.9375rem;'>"
     "<a href='https://github.com/AsherGeorgy/Portfolio-Optimization-Model/tree/main' target='_blank'>View Source Code on GitHub</a>"
     "</p>",
     unsafe_allow_html=True,
 )
 
 st.markdown(
-    "<p style='text-align:center; font-size: 14px; color: #666; margin-top: 10px;'>"
+    "<p style='text-align:center; font-size: 0.8rem; color: #666; margin-top: 0.625rem;'>"
     "View sidebar for developer info and disclaimer"
     "</p>",
     unsafe_allow_html=True,
@@ -45,33 +52,37 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Link to full disclaimer
-    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeorgy.github.io/documents/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeorgy.github.io/blog/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
 
 # Separator line
 st.markdown("<hr style='border: 1px solid #003366;'>", unsafe_allow_html=True)
 
+
+# Program code starts here
+
 # Custom input fields
 st.markdown("<h3 style='color: #003366;'>Configure Your Portfolio:</h3>", unsafe_allow_html=True)
 user_input = st.text_input(
-    "Enter stock tickers separated by commas: ",
-    placeholder="aapl, msft, tsla",
-    key="user_input",
-).strip()
+                            "Enter stock tickers separated by commas: ",
+                            placeholder="aapl, msft, tsla",
+                            key="user_input",
+                        ).strip()
 
-target_cagr = st.slider(
-        "Target CAGR (%):",
+target_return = st.slider(
+        "Target Expected Annual Return (%):",
         min_value=2.0,
         max_value=100.0,
         value=50.0,
-        key="target_cagr",
-        help="Compound Annual Growth Rate (%) you'd like your portfolio to achieve while minimizing volatility.",
+        step=0.5,
+        key="target_return",
+        help="Target annual return (%) you'd like your portfolio to achieve while minimizing volatility."
     )/100
 
 # Sliders for optional settings
 with st.expander("Additional Settings"):
     benchmark_index = st.selectbox(
     "Select an index to benchmark the portfolio:",
-    ["^IXIC", "^GSPC", "^DJI"],
+    ["^GSPC", "^IXIC", "^DJI"],
     key="benchmark_index",
     help="Performance of your portfolio will be benchmarked against this index's performance over the time period of analysis."
     )
@@ -116,17 +127,20 @@ if run_button:
 elif random_button:
     assets_list = dp.random_button()
 
-no_of_iterations = 1000     # Number of Monte Carlo simulations
+no_of_iterations = 10000     # Number of Monte Carlo simulations
 
 
 if assets_list is not None:
     # Retrieve Data
-    adj_close, benchmark_df, combined_df, benchmark_name = dp.retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years)
+    adj_close, benchmark_df, combined_df, benchmark_name = dp.retrieve_data(
+        assets_list, risk_free_rate, benchmark_index, no_of_years
+    )
 
-    # Calculate Returns and Risk Statistics
+    # Control Flow
     if adj_close is None or benchmark_df is None or combined_df is None or benchmark_name is None:
         None
     else:
+        # Calculate Returns and Risk Statistics
         returns_assets, returns_assets_ann, returns_assets_cov, returns_benchmark, returns_all_corr = opt.return_stats(
             adj_close, benchmark_df, combined_df
         )
@@ -137,12 +151,14 @@ if assets_list is not None:
         )
 
         # Optimize Portfolio Using Mean-Variance Optimization
-        optimal_weights, target_cagr_valid = opt.opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr)
+        optimal_weights, target_return_valid = opt.opt_portfolio_cvxpy(
+            returns_assets_ann, returns_assets_cov, target_return
+        )
 
         # Outputs
         # Output Results
         vis.opt_portfolio_results(
-            optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_cagr_valid
+            optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_return_valid
         )
         
         # Visualize Results
