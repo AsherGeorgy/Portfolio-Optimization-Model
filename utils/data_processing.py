@@ -4,7 +4,8 @@ import streamlit as st
 import yfinance as yf
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 # Inputs
 
@@ -58,7 +59,7 @@ def generate_random_inputs():
     st.markdown('________________________________________________________________________')
     st.markdown("<h5 style='color: #003366;'>Running optimization...</h5>", unsafe_allow_html=True)
 
-    return assets_list
+    return list(assets_list)
 
 def assets(user_input):
     st.markdown("##### Processing input tickers...")
@@ -67,7 +68,7 @@ def assets(user_input):
         return None
 
     # Split and strip tickers, removing empty or whitespace-only entries
-    input_split = [ticker.strip().replace("'", "").upper() for ticker in user_input.split(',') if ticker.strip()]
+    input_split = [ticker.strip().replace("'", "").replace('"', '').upper() for ticker in user_input.split(',') if ticker.strip()]
     if not input_split:
         st.error("No valid tickers found in input. Try again.")
 
@@ -82,11 +83,11 @@ def assets(user_input):
         try:
             stock = yf.Ticker(ticker)
             stock_data = stock.history(period="1mo")
-            stock_name = stock.info.get("longName")
             if stock_data.empty:  
                 invalid_tickers.append(ticker)
             else:
                 valid_assets.append(ticker)
+                stock_name = stock.info.get("longName")
                 stock_names[ticker] = stock_name
         except Exception:
             invalid_tickers.append(ticker)
@@ -117,35 +118,37 @@ def random_button():
     return assets_list
 
 
+
 # Processes
 
 
 def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):  
     # Determine start_date and end_date based on no_of_years
     end_date = datetime.today()
-    start_date = end_date - timedelta(days=int(no_of_years*365))
+    start_date = end_date - relativedelta(years=no_of_years)
     
-    # Assets data
-    adj_close = pd.DataFrame()
+    # Download adjusted close prices for assets
+    adj_close = yf.download(assets_list, start=start_date, end=end_date)['Adj Close']
+
+    # Check if there is any missing data for the assets
     for t in assets_list:
-        adj_close[t] = yf.download(t, start=start_date, end=end_date)['Adj Close']
         if adj_close[t].empty:
-            st.error(f"No data available for asset: {t}. Try again.")
-            return None, None, None, None
+            st.error(f"No data available for asset {t} in the given time period. Try again.")
+            return None, None
+
+    # Retrieve long names of assets
+    asset_names = []
+    for t in assets_list:
+        ticker = yf.Ticker(t)
+        company_name = ticker.info.get('longName', 'Unknown Name')
+        asset_names.append(company_name)
     
     # Benchmark index data
     benchmark_df = pd.DataFrame()
     benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date)['Adj Close']
     if benchmark_df.empty:
-        st.error(f"No data available for benchmark index: {benchmark_index}.  Try again.")
+        st.error(f"No data available for benchmark index {benchmark_index}.  Try again.")
         return None, None, None, None
-    
-    # Retrieve long names of assets 
-    asset_names = []
-    for t in assets_list:
-        t = yf.Ticker(t)
-        company_name = t.info['longName']
-        asset_names.append(company_name)
 
     # Retrieve long name of benchmark index
     benchmark_ticker = yf.Ticker(benchmark_index)
