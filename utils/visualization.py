@@ -11,7 +11,7 @@ import seaborn as sns
 from utils.optimization import portfolio_stats
 
 
-def opt_portfolio_results(optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_cagr_valid):
+def opt_portfolio_results(optimal_weights, returns_assets, returns_assets_ann, returns_assets_cov, risk_free_rate, assets_list, returns_benchmark, benchmark_index, benchmark_name, target_return_valid):
     """
     Displays the results of the portfolio optimization if the optimal weights are valid.
     """
@@ -32,7 +32,7 @@ def opt_portfolio_results(optimal_weights, returns_assets, returns_assets_ann, r
     # Set 'Asset' column as the index
     results_df.set_index('Asset', inplace=True)
 
-    st.markdown(f"The portfolio allocation, optimized to meet the <span style='color: #003366;'><b>target CAGR of {target_cagr_valid * 100:.2f}% while minimizing volatility</b></span>, based on historical data, is as follows:", unsafe_allow_html=True)
+    st.markdown(f"The portfolio allocation, optimized to meet the <span style='color: #003366;'><b>target Expected Annual Return of {target_return_valid * 100:.2f}% while minimizing volatility</b></span>, based on historical data, is as follows:", unsafe_allow_html=True)
     # Display the weights table
     st.write(results_df.T)
 
@@ -53,7 +53,7 @@ def opt_portfolio_results(optimal_weights, returns_assets, returns_assets_ann, r
 
     with col1:
         # Display portfolio statistics using st.metric() with delta or custom formatting
-        st.metric(label="CAGR", value=f"{optimal_portfolio_return * 100:.2f}%")
+        st.metric(label="Expected Annual Return", value=f"{optimal_portfolio_return * 100:.2f}%")
         st.metric(label="Average Annual Volatility", value=f"{optimal_portfolio_volatility * 100:.2f}%")
         st.metric(label="Sharpe Ratio", value=f"{optimal_sharpe_ratio:.4f}")
 
@@ -305,7 +305,7 @@ def generate_asset_and_portfolio_tables(
         ]
 
     # Display Table 1
-    st.markdown("The table below shows the CAGR, Volatility and Sharpe Ratio of constituent assets over the period of analysis:")
+    st.markdown("The table below shows the Expected Annual Return, Volatility and Sharpe Ratio of constituent assets over the period of analysis:")
     st.markdown("<h5 style='color: #003366;'>Asset Metrics</h5>", unsafe_allow_html=True)
     table1_df = pd.DataFrame(table1_data)
     st.write(table1_df.set_index("Metric"))
