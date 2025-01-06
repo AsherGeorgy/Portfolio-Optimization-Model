@@ -6,7 +6,7 @@ import cvxpy as cp
 
 def return_stats(adj_close, benchmark_df, combined_df):
     """
-    Calculates return statistics (annualized returns, volatility, covariance, and correlation) for assets and a benchmark.
+    Calculates return statistics (annualized returns, covariance, and correlation) for assets and a benchmark.
     Returns pd DataFrames.
     """
     # Calculate simple returns and covariance of the assets
@@ -52,7 +52,7 @@ def eff_frontier(assets, returns_assets_ann, returns_assets_cov, risk_free_rate,
     
     # Monte Carlo Simulation
     for i in range (no_of_iterations):
-        # Generate random weights which add up to 1 and append to weight_list
+        # Generate random weights (numbering len(assets)) which add up to 1 and append to weight_list every iteration
         no_of_tickers = len(assets)
         random_floats = np.random.random(no_of_tickers)
         weights = random_floats/np.sum(random_floats)
@@ -66,11 +66,11 @@ def eff_frontier(assets, returns_assets_ann, returns_assets_cov, risk_free_rate,
     weights = np.array(weights_list)
     pfolio_return = np.array(pfolio_return)*100
     pfolio_volatility = np.array(pfolio_volatility)*100
-    sharpe_ratios = (pfolio_return - risk_free_rate*100) / pfolio_volatility
+    sharpe_ratios = (pfolio_return - risk_free_rate)*100 / pfolio_volatility
     
     return pfolio_volatility, pfolio_return, weights, sharpe_ratios
 
-def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
+def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_return):
     """
     Optimizes portfolio allocation using Mean-Variance Optimization with convex optimization (cvxpy).
     Returns floats (or None if the optimization fails).
@@ -86,24 +86,25 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
     n = len(returns_assets_ann.columns)  # Number of assets (columns in the dataframe)
     w = cp.Variable(n)  # Portfolio weights as a cvxpy variable
 
-    # Check if the input target_cagr is feasible (it needs to be lower than the max average return of individual assets and higher than the min average return)
+    # Check if the input target_return is feasible (it needs to be lower than the max average return of individual assets and higher than the min average return)
     max_expected_return = returns_assets_ann.mean().max()
     min_expected_return = returns_assets_ann.mean().min()
 
-    if target_cagr > max_expected_return:
-        st.error(f"Warning: The target CAGR of {target_cagr*100:.2f}% exceeds the maximum feasible portfolio CAGR of {max_expected_return*100:.2f}%, which is based on the highest historical return of the portfolio's assets during this time period.")
-        st.success(f"CAGR has been adjusted to the maximum feasible return of {(max_expected_return - 0.0001)*100:.2f}%.")
+    if target_return > max_expected_return:
+        st.error(f"Warning: The target expected annual return of {target_return*100:.2f}% exceeds the maximum feasible portfolio annual return of {max_expected_return*100:.2f}%, which is based on the highest historical annual return of the portfolio's assets during this time period.")
+        st.success(f"Target expected annual return has been adjusted to the maximum feasible value of {(max_expected_return - 0.0001)*100:.2f}%.")
         
-        target_cagr_valid = max_expected_return - 0.0001  # Adjust target_cagr to the highest feasible value
+        target_return_valid = max_expected_return - 0.0001  # Adjusted target_return to the highest feasible value
 
-    elif target_cagr < min_expected_return:
-        st.warning(f"Warning: The target CAGR of {target_cagr*100:.2f}% is below the minimum feasible return of {min_expected_return*100:.2f}%, which is based on the lowest historical return of the portfolio's assets during this time period.")
-        st.success(f"CAGR has been adjusted to the minimum feasible return of {(min_expected_return + 0.0001)*100:.2f}%.")
-
-        target_cagr_valid = min_expected_return + 0.0001  # Adjust target_cagr to the lowest feasible value
+    elif target_return < min_expected_return:
+        st.error(f"Warning: The target annual return of {target_return*100:.2f}% is below the minimum feasible return of {min_expected_return*100:.2f}%. This minimum is based on the lowest historical annual return of the portfolio's assets during the selected time period.")
+        st.success(f"Expected annual return has been adjusted to the minimum feasible return of {(min_expected_return + 0.0001)*100:.2f}%.")
+        
+        target_return_valid = min_expected_return + 0.0001  # Adjusted target_return to the lowest feasible value
 
     else:
-        target_cagr_valid = target_cagr
+        target_return_valid = target_return
+
 
 
     
@@ -117,7 +118,7 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
     # Define the constraints: 
     constraints = [
         cp.sum(w) == 1,  # Sum of weights equals 1 (fully invested)
-        ret == target_cagr_valid,  # Target minimum return constraint
+        ret == target_return_valid,  # Target minimum return constraint
         w >= 0  # Non-negative weights (no short positions)
     ]
     
@@ -129,7 +130,7 @@ def opt_portfolio_cvxpy(returns_assets_ann, returns_assets_cov, target_cagr):
     # Check if the optimization was successful and the optimal weights are valid
     if prob.status != cp.OPTIMAL or optimal_weights is None or any(np.isnan(optimal_weights)):
         st.write(f"Optimization failed. Solver status: {prob.status} or Invalid portfolio weights.")
-        return None, target_cagr_valid  
+        return None, target_return_valid  
 
-    return optimal_weights, target_cagr_valid
+    return optimal_weights, target_return_valid
 
