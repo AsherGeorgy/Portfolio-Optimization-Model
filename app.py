@@ -36,15 +36,15 @@ st.markdown(
 with st.sidebar:
     # Developer Information
     st.markdown("<h1 style='color: #003366;'>Developed by:</h1>", unsafe_allow_html=True)
-    st.markdown("<hr style='border: 0; border-top: 2px solid #003366; margin-top: 0px; margin-bottom: 10px;'>", unsafe_allow_html=True)  # Underline-style line below the heading
+    st.markdown("<hr style='border: 0; border-top: 0.125rem solid #003366; margin-top: 0px; margin-bottom: 0.625rem;'>", unsafe_allow_html=True)  # Underline-style line below the heading
     st.markdown("<h3 style='font-weight: bold; color: #333;'>Asher Georgy</h3>", unsafe_allow_html=True)
     st.markdown("<p style='color: #555;'>Finance professional turned data enthusiast. <br><a href='https://ashergeorgy.github.io/' target='_blank' style='color: #007BFF; text-decoration: none;'>Visit my Website</a></p>", unsafe_allow_html=True)
 
     # Disclaimer Section
     st.markdown("<h1 style='color: #003366;'>Disclaimer:</h1>", unsafe_allow_html=True)
-    st.markdown("<hr style='border: 0; border-top: 2px solid #003366; margin-top: 0px; margin-bottom: 10px;'>", unsafe_allow_html=True)  # Underline-style line below the heading
+    st.markdown("<hr style='border: 0; border-top: 0.125rem solid #003366; margin-top: 0px; margin-bottom: 0.625rem;'>", unsafe_allow_html=True)  # Underline-style line below the heading
     st.markdown("""
-    <div style="color: #555; font-size: 14px;">
+    <div style="color: #555; font-size: 0.875rem;">
         <p>This application is for educational and informational purposes only. The analysis, data, and results provided by this tool are based on historical data and theoretical models. 
         <u><strong>They do not predict future performance.</strong></u></p>
         <p>Users should conduct their own due diligence, verify results, and consult a qualified financial advisor before making any investment decisions.</p>
@@ -52,10 +52,25 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Link to full disclaimer
-    st.markdown("<p style='font-size: 13px; text-align: center; margin-top: 20px;'><a href='https://ashergeorgy.github.io/blog/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 0.8125rem; text-align: center; margin-top: 1.25rem;'><a href='https://ashergeorgy.github.io/blog/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
 
 # Separator line
-st.markdown("<hr style='border: 1px solid #003366;'>", unsafe_allow_html=True)
+st.markdown("<hr style='border: 0.0625rem solid #003366;'>", unsafe_allow_html=True)
+
+
+# Instructions
+st.markdown(
+    "<h5 style='color: #003366; background-color: #e6f7ff; padding: 0.625rem; font-weight: bold;'>Instructions:</h5>", unsafe_allow_html=True)
+st.markdown(
+    """
+    <div style="color: #555; background-color: #e6f7ff; padding: 0.9375rem; border-radius: 0.3125rem; box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.1); margin-bottom: 1.25rem;">
+        <p><strong>1. Enter Stock Tickers:</strong> Input the stock tickers separated by commas (e.g., <i>'AAPL, MSFT, TSLA'</i>) in the input field below.</p>
+        <p><strong>2. Set Desired Target Return:</strong> Use the slider to set the target Annual Return you desire for your portfolio.</p>
+        <p><strong>3. Run the Optimization:</strong> Click the <b>Run</b> button to generate the optimized portfolio.</p>
+        <p><em>Alternatively, Click the Test with random tickers button to use randomly selected stock tickers for testing.</em></p>
+    </div>
+    """, unsafe_allow_html=True
+)
 
 
 # Program code starts here
@@ -168,6 +183,26 @@ if assets_list is not None:
 
 else:
     None 
+
+# Separator line
+st.markdown("<hr style='border: 0.0625rem solid #003366;'>", unsafe_allow_html=True)
+
+# Data source and error warnings 
+st.markdown(
+    """<br><br><br><h6 style="color: #ff6600;">Note:</h6>
+    <ul style="font-size: 0.75rem; color: #ff6600; line-height: 1.6;">
+        <li>This application utilizes the free Yahoo Finance (yfinance) API, which may have reliability limitations compared to premium data sources. As a result, it may occasionally encounter issues due to web scraping.</li>
+        <li>The API generally provides accurate data for stocks listed on NASDAQ and NYSE. However, for stocks on other exchanges, exchange-specific suffixes (e.g., <i>.L</i> for the London Stock Exchange) may be required. Please note that this data may still be inconsistent or unreliable in some cases.</li>
+        <li>If you experience errors with Streamlit or yfinance, refreshing the page typically resolves the issue.</li>
+    </ul>""",
+    unsafe_allow_html=True
+)
+
+
+
+
+
+
 
 
 
