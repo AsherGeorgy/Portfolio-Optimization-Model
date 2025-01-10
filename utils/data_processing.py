@@ -95,6 +95,7 @@ def assets(user_input):
     if invalid_tickers:
         st.error(f"Invalid ticker found: {', '.join(invalid_tickers)}")
         st.error("Try again with valid tickers!")
+        st.error("Perhaps you forgot a comma?")
         return None
     elif valid_assets:
         for ticker, name in stock_names.items():
