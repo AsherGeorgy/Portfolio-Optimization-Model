@@ -38,15 +38,15 @@ with st.sidebar:
     st.markdown("<h1 style='color: #003366;'>Developed by</h1>", unsafe_allow_html=True)
     st.markdown("<hr style='border: 0; border-top: 0.125rem solid #003366; margin-top: 0px; margin-bottom: 0.625rem;'>", unsafe_allow_html=True)  # Underline-style line below the heading
     st.markdown("<h3 style='font-weight: bold; color: #333;'>Asher Georgy</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #555;'>Finance professional turned data enthusiast. <br><a href='https://ashergeorgy.github.io/' target='_blank' style='color: #007BFF; text-decoration: none;'>Visit my Website</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #555;'>Finance professional turned data enthusiast. <br><a href='https://www.linkedin.com/in/asher-georgy/' target='_blank' style='color: #007BFF; text-decoration: none;'>LinkedIn</a> | <a href='https://github.com/AsherGeorgy' target='_blank' style='color: #007BFF; text-decoration: none;'>Github</a> | <a href='https://ashergeorgy.github.io/' target='_blank' style='color: #007BFF; text-decoration: none;'>Website</a> </p>", unsafe_allow_html=True)
 
-    st.markdown("<h2 style='color: #003366;'>Error Warnings</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #003366;'>Limitations</h2>", unsafe_allow_html=True)
     st.markdown("<hr style='border: 0; border-top: 0.125rem solid #003366; margin-top: 0px; margin-bottom: 0.625rem;'>", unsafe_allow_html=True)  # Underline-style line below the heading
     st.markdown("""
     <div>
-        <p><strong>1. Yahoo Finance API:</strong> This application utilizes the unofficial free Yahoo Finance (yfinance) API, which may have reliability limitations compared to premium data sources. It may occasionally encounter issues with web scraping, causing errors.</p>
-        <p><strong>2. Exchange-Specific Data:</strong> The API generally provides accurate data for NASDAQ and NYSE stocks. However, for other exchanges, exchange-specific suffixes (e.g., <i>.L</i> for the London Stock Exchange) may be required. This may still be inconsistent or unreliable.</p>
-        <p><strong>3. Error Resolution:</strong> If you experience errors, refreshing the page typically resolves the issue.</p>
+        <p><strong>1.</strong> This application utilizes the unofficial free Yahoo Finance (yfinance) API, which may have reliability limitations compared to premium data sources. It may occasionally encounter issues with web scraping, causing errors.</p>
+        <p><strong>2.</strong> The API generally provides accurate data for NASDAQ and NYSE stocks. However, for other exchanges, exchange-specific suffixes (e.g., <i>.L</i> for the London Stock Exchange) may be required. This may still be inconsistent or unreliable.</p>
+        <p><strong>3.</strong> If you experience errors, refreshing the page typically resolves the issue.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -63,7 +63,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     # Link to full disclaimer
-    st.markdown("<p style='font-size: 0.8125rem; text-align: center; margin-top: 1.25rem;'><a href='https://ashergeorgy.github.io/blog/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; margin-top: 1.25rem;'><a href='https://ashergeorgy.github.io/blog/Limitations%20and%20Disclaimer.html'>View full Disclaimer and Limitations</a></p>", unsafe_allow_html=True)
 
 # Separator line
 st.markdown("<hr style='border: 0.0625rem solid #003366;'>", unsafe_allow_html=True)
@@ -89,7 +89,7 @@ st.markdown(
 # Custom input fields
 st.markdown("<h3 style='color: #003366;'>Configure Your Portfolio:</h3>", unsafe_allow_html=True)
 user_input = st.text_input(
-                            "Enter stock tickers separated by commas: ",
+                            "Enter stock tickers (separate by commas): ",
                             placeholder="aapl, msft, tsla",
                             key="user_input",
                         ).strip()
