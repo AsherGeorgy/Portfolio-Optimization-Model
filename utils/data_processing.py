@@ -129,7 +129,7 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     start_date = end_date - relativedelta(years=no_of_years)
     
     # Download adjusted close prices for assets
-    adj_close = yf.download(assets_list, start=start_date, end=end_date)['Adj Close']
+    adj_close = yf.download(assets_list, start=start_date, end=end_date)['Close']
 
     # Check if there is any missing data for the assets
     for t in assets_list:
