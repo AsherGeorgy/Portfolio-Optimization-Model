@@ -146,7 +146,7 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     
     # Benchmark index data
     benchmark_df = pd.DataFrame()
-    benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date)['Adj Close']
+    benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date)['Close']
     if benchmark_df.empty:
         st.error(f"No data available for benchmark index {benchmark_index}.  Try again.")
         return None, None, None, None
