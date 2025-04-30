@@ -57,7 +57,7 @@ def generate_random_inputs():
         st.success(f"Ticker validated: {sample_assets[ticker]} ({ticker}) ")
 
     st.markdown('________________________________________________________________________')
-    st.markdown("<h5 style='color: #003366;'>Running optimization...</h5>", unsafe_allow_html=True)
+    st.markdown("<h5 style='color: #003366;'>Running optimization... This might take a few seconds...</h5>", unsafe_allow_html=True)
 
     return list(assets_list)
 
@@ -101,7 +101,7 @@ def assets(user_input):
         for ticker, name in stock_names.items():
             st.success(f"Ticker validated: {name} ({ticker})")
         st.markdown('________________________________________________________________________')
-        st.markdown("##### Running optimization...")
+        st.markdown("<h5 style='color: #003366;'>Running optimization... This might take a few seconds...</h5>", unsafe_allow_html=True)
         return valid_assets
 
 def run_button(user_input):
@@ -129,7 +129,7 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     start_date = end_date - relativedelta(years=no_of_years)
     
     # Download adjusted close prices for assets
-    adj_close = yf.download(assets_list, start=start_date, end=end_date)['Close']
+    adj_close = yf.download(assets_list, start=start_date, end=end_date, auto_adjust=True)['Close']
 
     # Check if there is any missing data for the assets
     for t in assets_list:
@@ -146,7 +146,7 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     
     # Benchmark index data
     benchmark_df = pd.DataFrame()
-    benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date)['Close']
+    benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date, auto_adjust=True)['Close']
     if benchmark_df.empty:
         st.error(f"No data available for benchmark index {benchmark_index}.  Try again.")
         return None, None, None, None
