@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from curl_cffi import requests
 
 # Inputs
 
@@ -129,7 +130,8 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     start_date = end_date - relativedelta(years=no_of_years)
     
     # Download adjusted close prices for assets
-    adj_close = yf.download(assets_list, start=start_date, end=end_date, auto_adjust=True)['Close']
+    session = requests.Session(impersonate="chrome")
+    adj_close = yf.download(assets_list, start=start_date, end=end_date, auto_adjust=True, session=session)['Close']
 
     # Check if there is any missing data for the assets
     for t in assets_list:
@@ -146,7 +148,8 @@ def retrieve_data(assets_list, risk_free_rate, benchmark_index, no_of_years):
     
     # Benchmark index data
     benchmark_df = pd.DataFrame()
-    benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date, auto_adjust=True)['Close']
+    session = requests.Session(impersonate="chrome")
+    benchmark_df[benchmark_index] = yf.download(benchmark_index, start=start_date, end=end_date, auto_adjust=True, session=session)['Close']
     if benchmark_df.empty:
         st.error(f"No data available for benchmark index {benchmark_index}.  Try again.")
         return None, None, None, None
