@@ -153,7 +153,7 @@ if run_button:
 elif random_button:
     assets_list = dp.random_button()
 
-no_of_iterations = 10000     # Number of Monte Carlo simulations
+no_of_iterations = 5000     # Number of Monte Carlo simulations
 
 
 if assets_list is not None:
